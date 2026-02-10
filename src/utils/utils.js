@@ -35,5 +35,5 @@ export const normalizeImageUrl = (url) => {
     // 4. Handle known backend static paths
     // If it starts with /uploads or looks like a filename, assume backend
     const cleanPath = url.startsWith('/') ? url : `/${url}`;
-    return `http://localhost:5001${cleanPath}`;
+    return `${API_BASE_URL}${cleanPath}`;
 };

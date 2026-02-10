@@ -4,7 +4,7 @@ import { useStore } from '../context/StoreContext.jsx';
 import { toast } from '../components/ui/sonner';
 import { normalizeImageUrl } from '../utils/utils.js';
 
-const API_BASE_URL = 'http://localhost:5001';
+const API_BASE_URL = 'https://thakkalies-api.onrender.com'
 
 export default function ProductsPage({ onNavigate, initialCategoryId, initialStoreId, initialSearchQuery }) {
   const [products, setProducts] = useState([]);

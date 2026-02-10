@@ -19,7 +19,7 @@ import { Button } from '../components/ui/button.jsx';
 import { toast } from '../components/ui/sonner';
 import { normalizeImageUrl } from '../utils/utils.js';
 
-const API_BASE_URL = 'http://localhost:5001';
+const API_BASE_URL = 'https://thakkalies-api.onrender.com';
 
 export default function ProductDetailPage({ productId, onNavigate }) {
   const [quantity, setQuantity] = useState(1);

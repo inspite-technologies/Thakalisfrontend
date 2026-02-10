@@ -178,7 +178,7 @@ export default function OrderDetailPage({ orderId, onNavigate }) {
             <div className="space-y-10">
               <Button
                 onClick={() => {
-                  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+                  const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://thakkalies-api.onrender.com';
                   window.open(`${API_URL}/order/invoice/${order.id}`, '_blank');
                 }}
                 className="w-full btn-primary"
