@@ -19,8 +19,7 @@ import { useStore } from '../context/StoreContext.jsx';
 import { Button } from '../components/ui/button.jsx';
 import { toast } from '../components/ui/sonner';
 import { normalizeImageUrl } from '../utils/utils.js';
-
-const API_BASE_URL = 'https://thakkalies-api.onrender.com';
+import { API_BASE_URL } from '../services/api.js';
 
 export default function HomePage({ onNavigate }) {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -34,7 +33,20 @@ export default function HomePage({ onNavigate }) {
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/stores/home-carousel`);
+        const token = localStorage.getItem('token');
+        const headers = {
+          'Content-Type': 'application/json',
+        };
+
+        if (token) {
+          headers['token'] = token;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/stores/home`, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({})
+        });
         const result = await response.json();
         if (result.success) {
           setBanners(result.data.banners || []);
