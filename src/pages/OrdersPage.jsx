@@ -1,0 +1,137 @@
+import { Package, ChevronRight, RotateCcw } from 'lucide-react';
+import { useStore } from '../context/StoreContext.jsx';
+import { Button } from '../components/ui/button.jsx';
+
+const statusColors = {
+  confirmed: 'bg-[#E8F5F1] text-[#006A52]',
+  packed: 'bg-[#FFF3ED] text-[#E85A24]',
+  out_for_delivery: 'bg-[#E8F5F1] text-[#006A52]',
+  delivered: 'bg-[#E8F5F1] text-[#22C55E]',
+  cancelled: 'bg-[#FFF3ED] text-[#EF4444]',
+};
+
+const statusLabels = {
+  confirmed: 'Confirmed',
+  packed: 'Packed',
+  out_for_delivery: 'Out for Delivery',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
+};
+
+export default function OrdersPage({ onNavigate }) {
+  const { orders } = useStore();
+
+  if (orders.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-24 h-24 bg-[#E8F5F1] rounded-full flex items-center justify-center mx-auto mb-6">
+            <Package className="w-12 h-12 text-[#006A52]" />
+          </div>
+          <h2 className="text-2xl font-bold text-[#1A1A1A] mb-2">No orders yet</h2>
+          <p className="text-[#666666] mb-6">Start shopping to see your orders here</p>
+          <Button onClick={() => onNavigate('products')} className="btn-primary">
+            Browse Products
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#FAFAFA]">
+      <div className="bg-white border-b border-[#E5E5E5]">
+        <div className="section-container py-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">Order History</h1>
+        </div>
+      </div>
+
+      <div className="section-container py-8">
+        <div className="space-y-4">
+          {orders.map((order) => (
+            <div
+              key={order.id}
+              className="bg-white rounded-2xl p-6 shadow-sm"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-[#E8F5F1] rounded-xl flex items-center justify-center">
+                    <Package className="w-6 h-6 text-[#006A52]" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#1A1A1A]">{order.orderId}</p>
+                    <p className="text-sm text-[#666666]">
+                      {new Date(order.orderDate).toLocaleDateString('en-IN', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </p>
+                  </div>
+                </div>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${statusColors[order.status]
+                    }`}
+                >
+                  {statusLabels[order.status]}
+                </span>
+              </div>
+
+              <div className="border-t border-[#E5E5E5] pt-4 mb-4">
+                <p className="text-sm text-[#666666] mb-2">
+                  {order.items.length} item{order.items.length > 1 ? 's' : ''}
+                </p>
+                <div className="flex gap-2">
+                  {order.items.slice(0, 4).map((item, index) => (
+                    <img
+                      key={index}
+                      src={item.product.image}
+                      alt={item.product.name}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = '/product-placeholder.png';
+                      }}
+                      className="w-16 h-16 object-cover rounded-lg bg-[#F5F5F5]"
+                    />
+                  ))}
+                  {order.items.length > 4 && (
+                    <div className="w-16 h-16 bg-[#F5F5F5] rounded-lg flex items-center justify-center">
+                      <span className="text-sm text-[#666666]">
+                        +{order.items.length - 4}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-[#666666]">Total Amount</p>
+                  <p className="text-xl font-bold text-[#006A52]">₹{order.total}</p>
+                </div>
+                <div className="flex gap-2">
+                  {order.status === 'delivered' && (
+                    <Button
+                      variant="outline"
+                      className="border-[#006A52] text-[#006A52] hover:bg-[#E8F5F1]"
+                    >
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      Reorder
+                    </Button>
+                  )}
+                  <Button
+                    onClick={() => onNavigate('order-detail', { orderId: order.id })}
+                    className="btn-primary"
+                  >
+                    View Details
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
