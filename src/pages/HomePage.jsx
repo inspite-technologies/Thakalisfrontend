@@ -33,13 +33,34 @@ export default function HomePage({ onNavigate }) {
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
-        const token = localStorage.getItem('token');
+        let token = localStorage.getItem('token');
+
+        // If no token exists, get a guest token
+        if (!token) {
+          try {
+            const guestResponse = await fetch(`${API_BASE_URL}/user/guest`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              }
+            });
+            const guestResult = await guestResponse.json();
+
+            if (guestResult.success && guestResult.token) {
+              token = guestResult.token;
+              localStorage.setItem('token', token);
+            }
+          } catch (guestError) {
+            console.error('Error fetching guest token:', guestError);
+          }
+        }
+
         const headers = {
           'Content-Type': 'application/json',
         };
 
         if (token) {
-          headers['token'] = token;
+          headers['Authorization'] = `Bearer ${token}`;
         }
 
         const response = await fetch(`${API_BASE_URL}/stores/home`, {
