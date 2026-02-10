@@ -1,27 +1,67 @@
-import { ChevronLeft, MapPin, Package, CreditCard, Truck, Check } from 'lucide-react';
-import { useStore } from '../context/StoreContext.jsx';
+import { ChevronLeft, MapPin, Package, CreditCard, Truck, Check, X } from 'lucide-react';
+import { useState } from 'react';
+import { useStore, normalizeOrders } from '../context/StoreContext.jsx';
 import { Button } from '../components/ui/button.jsx';
 import { normalizeImageUrl } from '../utils/utils.js';
+import { cancelProductApi } from '../services/orderService.js';
 
 const statusColors = {
-  confirmed: 'bg-[#E8F5F1] text-[#006A52]',
-  packed: 'bg-[#FFF3ED] text-[#E85A24]',
-  out_for_delivery: 'bg-[#E8F5F1] text-[#006A52]',
-  delivered: 'bg-[#E8F5F1] text-[#22C55E]',
-  cancelled: 'bg-[#FFF3ED] text-[#EF4444]',
+  Pending: 'bg-[#FFF3ED] text-[#E85A24]',
+  Accepted: 'bg-[#E8F5F1] text-[#006A52]',
+  Delivered: 'bg-[#E8F5F1] text-[#22C55E]',
+  Cancelled: 'bg-[#FFF3ED] text-[#EF4444]',
+  Rejected: 'bg-[#FFF3ED] text-[#EF4444]',
 };
 
 const statusLabels = {
-  confirmed: 'Confirmed',
-  packed: 'Packed',
-  out_for_delivery: 'Out for Delivery',
-  delivered: 'Delivered',
-  cancelled: 'Cancelled',
+  Pending: 'Pending',
+  Accepted: 'Accepted',
+  Delivered: 'Delivered',
+  Cancelled: 'Cancelled',
+  Rejected: 'Rejected',
 };
 
 export default function OrderDetailPage({ orderId, onNavigate }) {
-  const { orders } = useStore();
+  const { orders, setOrders } = useStore();
   const order = orders.find((o) => o.id === orderId);
+  const [cancellingProducts, setCancellingProducts] = useState({});
+  const [cancelError, setCancelError] = useState(null);
+  const [cancelSuccess, setCancelSuccess] = useState(null);
+
+  const handleCancelProduct = async (productId) => {
+    try {
+      setCancellingProducts(prev => ({ ...prev, [productId]: true }));
+      setCancelError(null);
+      setCancelSuccess(null);
+
+      const result = await cancelProductApi(order.id, productId);
+
+      if (result.success) {
+        // Normalize the backend response
+        const normalizedOrder = normalizeOrders([result.data])[0];
+
+        // Update local order state
+        const updatedOrders = orders.map(o => {
+          if (o.id === order.id) {
+            return normalizedOrder;
+          }
+          return o;
+        });
+        setOrders(updatedOrders);
+        setCancelSuccess('Product cancelled successfully');
+
+        // Clear success message after 3 seconds
+        setTimeout(() => setCancelSuccess(null), 3000);
+      } else {
+        setCancelError(result.msg || 'Failed to cancel product');
+      }
+    } catch (error) {
+      console.error('Error cancelling product:', error);
+      setCancelError('Failed to cancel product. Please try again.');
+    } finally {
+      setCancellingProducts(prev => ({ ...prev, [productId]: false }));
+    }
+  };
 
   if (!order) {
     return (
@@ -100,37 +140,89 @@ export default function OrderDetailPage({ orderId, onNavigate }) {
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <h3 className="font-semibold text-[#1A1A1A] mb-4 flex items-center gap-2">
                 <Package className="w-5 h-5 text-[#006A52]" />
-                Items ({order.items.length})
+                Items ({order.items?.length || 0})
               </h3>
+
+              {/* Success/Error Messages */}
+              {cancelSuccess && (
+                <div className="mb-4 p-3 bg-[#E8F5F1] text-[#006A52] rounded-lg flex items-center gap-2">
+                  <Check className="w-5 h-5" />
+                  <span>{cancelSuccess}</span>
+                </div>
+              )}
+              {cancelError && (
+                <div className="mb-4 p-3 bg-[#FFF3ED] text-[#EF4444] rounded-lg flex items-center gap-2">
+                  <X className="w-5 h-5" />
+                  <span>{cancelError}</span>
+                </div>
+              )}
+
               <div className="space-y-4">
-                {order.items.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex gap-4 pb-4 border-b border-[#E5E5E5] last:border-0 last:pb-0"
-                  >
-                    <img
-                      src={normalizeImageUrl(item.product.image)}
-                      alt={item.product.name}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = '/product-placeholder.png';
-                      }}
-                      className="w-20 h-20 object-cover rounded-xl bg-[#F5F5F5]"
-                    />
-                    <div className="flex-1">
-                      <h4 className="font-medium text-[#1A1A1A]">{item.product.name}</h4>
-                      <p className="text-sm text-[#666666]">{item.product.shop}</p>
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-sm text-[#666666]">
-                          Qty: {item.quantity}
-                        </span>
-                        <span className="font-semibold text-[#006A52]">
-                          ₹{item.product.price * item.quantity}
-                        </span>
+                {order.items?.map((item, index) => {
+                  const productId = item.productId || item.product?._id || item.product?.id;
+                  const itemStatus = item.status || 'Pending';
+                  const canCancel = itemStatus === 'Pending' || itemStatus === 'Accepted';
+                  const isCancelling = cancellingProducts[productId];
+
+                  return (
+                    <div
+                      key={index}
+                      className="flex gap-4 pb-4 border-b border-[#E5E5E5] last:border-0 last:pb-0"
+                    >
+                      <img
+                        src={normalizeImageUrl(item.product?.image)}
+                        alt={item.product?.name || 'Product'}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/product-placeholder.png';
+                        }}
+                        className="w-20 h-20 object-cover rounded-xl bg-[#F5F5F5]"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-[#1A1A1A]">{item.product?.name || item.productName}</h4>
+                            <p className="text-sm text-[#666666]">{item.product?.shop}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[itemStatus]}`}>
+                                {statusLabels[itemStatus] || itemStatus}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="text-sm text-[#666666]">
+                            Qty: {item.quantity}
+                          </span>
+                          <span className="font-semibold text-[#006A52]">
+                            ₹{(item.product?.price || item.price) * item.quantity}
+                          </span>
+                        </div>
+                        {canCancel && (
+                          <div className="mt-2">
+                            <Button
+                              onClick={() => handleCancelProduct(productId)}
+                              disabled={isCancelling}
+                              className="btn-secondary text-sm py-1 px-3 h-auto"
+                            >
+                              {isCancelling ? (
+                                <>
+                                  <span className="inline-block w-3 h-3 border-2 border-[#666666] border-t-transparent rounded-full animate-spin mr-2"></span>
+                                  Cancelling...
+                                </>
+                              ) : (
+                                <>
+                                  <X className="w-4 h-4 mr-1" />
+                                  Cancel Item
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -175,17 +267,32 @@ export default function OrderDetailPage({ orderId, onNavigate }) {
               </div>
             </div>
 
-            <div className="space-y-10">
-              <Button
-                onClick={() => {
-                  const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://thakkalies-api.onrender.com';
-                  window.open(`${API_URL}/order/invoice/${order.id}`, '_blank');
-                }}
-                className="w-full btn-primary"
-              >
-                <Check className="w-4 h-4 mr-2" />
-                Download Invoice
-              </Button>
+            <div className="space-y-3">
+              {(() => {
+                // Check if any items are accepted or delivered
+                const hasAcceptedItems = order.items?.some(item =>
+                  item.status === 'Accepted' || item.status === 'Delivered'
+                );
+
+                return hasAcceptedItems ? (
+                  <Button
+                    onClick={() => {
+                      const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://thakkalies-api.onrender.com';
+                      window.open(`${API_URL}/order/invoice/${order.id}`, '_blank');
+                    }}
+                    className="w-full btn-primary"
+                  >
+                    <Check className="w-4 h-4 mr-2" />
+                    Download Invoice
+                  </Button>
+                ) : (
+                  <div className="text-center p-4 bg-[#FFF3ED] rounded-lg border border-[#E85A24]">
+                    <p className="text-sm text-[#E85A24] font-medium">
+                      📄 Invoice will be available after vendor accepts your items
+                    </p>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>

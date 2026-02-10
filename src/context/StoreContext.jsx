@@ -72,12 +72,14 @@ export const normalizeOrders = (backendOrders) => {
       id: order._id || order.id,
       orderId: order.orderId || order.razorpayOrderId || `ORD-${(order._id || order.id).slice(-6).toUpperCase()}`,
       orderDate: order.createdAt,
-      status: (order.status || 'confirmed').toLowerCase(),
+      status: order.orderStatus || order.status || 'Pending',
       total: order.totalAmount || order.amount || 0,
       subtotal: order.subtotal || order.totalAmount || order.amount || 0,
       deliveryFee: order.deliveryFee || 0,
       taxes: order.taxes || 0,
       items: items.map(item => ({
+        productId: item.productId?._id || item.productId, // Preserve the actual productId
+        status: item.status || 'Pending', // Preserve item status
         product: {
           id: item.productId?._id || item.productId,
           name: item.productName || item.productId?.productName || 'Product',
@@ -697,6 +699,7 @@ export function StoreProvider({ children }) {
         setDefaultAddress,
         updateUserDetails,
         orders,
+        setOrders,
         placeOrder,
         deliveryLocation,
         setDeliveryLocation,

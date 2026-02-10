@@ -3,19 +3,19 @@ import { useStore } from '../context/StoreContext.jsx';
 import { Button } from '../components/ui/button.jsx';
 
 const statusColors = {
-  confirmed: 'bg-[#E8F5F1] text-[#006A52]',
-  packed: 'bg-[#FFF3ED] text-[#E85A24]',
-  out_for_delivery: 'bg-[#E8F5F1] text-[#006A52]',
-  delivered: 'bg-[#E8F5F1] text-[#22C55E]',
-  cancelled: 'bg-[#FFF3ED] text-[#EF4444]',
+  Pending: 'bg-[#FFF3ED] text-[#E85A24]',
+  Accepted: 'bg-[#E8F5F1] text-[#006A52]',
+  Delivered: 'bg-[#E8F5F1] text-[#22C55E]',
+  Cancelled: 'bg-[#FFF3ED] text-[#EF4444]',
+  Rejected: 'bg-[#FFF3ED] text-[#EF4444]',
 };
 
 const statusLabels = {
-  confirmed: 'Confirmed',
-  packed: 'Packed',
-  out_for_delivery: 'Out for Delivery',
-  delivered: 'Delivered',
-  cancelled: 'Cancelled',
+  Pending: 'Pending',
+  Accepted: 'Accepted',
+  Delivered: 'Delivered',
+  Cancelled: 'Cancelled',
+  Rejected: 'Rejected',
 };
 
 export default function OrdersPage({ onNavigate }) {
@@ -81,19 +81,30 @@ export default function OrdersPage({ onNavigate }) {
                 <p className="text-sm text-[#666666] mb-2">
                   {order.items.length} item{order.items.length > 1 ? 's' : ''}
                 </p>
-                <div className="flex gap-2">
-                  {order.items.slice(0, 4).map((item, index) => (
-                    <img
-                      key={index}
-                      src={item.product.image}
-                      alt={item.product.name}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = '/product-placeholder.png';
-                      }}
-                      className="w-16 h-16 object-cover rounded-lg bg-[#F5F5F5]"
-                    />
-                  ))}
+                <div className="flex gap-2 flex-wrap">
+                  {order.items.slice(0, 4).map((item, index) => {
+                    const itemStatus = item.status || 'Pending';
+                    return (
+                      <div key={index} className="relative group">
+                        <img
+                          src={item.product.image}
+                          alt={item.product.name}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = '/product-placeholder.png';
+                          }}
+                          className="w-16 h-16 object-cover rounded-lg bg-[#F5F5F5]"
+                        />
+                        <span className={`absolute -top-1 -right-1 px-1.5 py-0.5 rounded text-xs font-medium ${statusColors[itemStatus]}`}>
+                          {statusLabels[itemStatus]?.charAt(0) || 'P'}
+                        </span>
+                        {/* Tooltip */}
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#1A1A1A] text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                          {item.product.name} - {statusLabels[itemStatus]}
+                        </div>
+                      </div>
+                    );
+                  })}
                   {order.items.length > 4 && (
                     <div className="w-16 h-16 bg-[#F5F5F5] rounded-lg flex items-center justify-center">
                       <span className="text-sm text-[#666666]">
@@ -110,7 +121,7 @@ export default function OrdersPage({ onNavigate }) {
                   <p className="text-xl font-bold text-[#006A52]">₹{order.total}</p>
                 </div>
                 <div className="flex gap-2">
-                  {order.status === 'delivered' && (
+                  {order.status === 'Delivered' && (
                     <Button
                       variant="outline"
                       className="border-[#006A52] text-[#006A52] hover:bg-[#E8F5F1]"

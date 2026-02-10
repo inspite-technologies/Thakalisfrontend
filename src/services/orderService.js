@@ -110,6 +110,22 @@ export const initializeRazorpayCheckout = (options) => {
 };
 
 /**
+ * Cancel a product in an order
+ * @param {string} orderId - The order ID
+ * @param {string} productId - The product ID to cancel
+ */
+export const cancelProductApi = async (orderId, productId) => {
+    if (!isAuthenticated()) return null;
+
+    const response = await fetch(`${ORDER_URL}/${orderId}/product/${productId}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status: 'Cancelled' })
+    });
+    return response.json();
+};
+
+/**
  * Create Razorpay checkout options
  * @param {Object} params - Parameters for checkout
  */
