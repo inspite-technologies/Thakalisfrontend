@@ -1,11 +1,7 @@
+import { API_BASE_URL } from '../services/api';
+
 /**
  * Normalizes image URLs from the backend.
- * Fixes issues with missing hostnames, port 7071, and common malformed paths.
- * 
- * @param {string} url - The raw URL or path from the backend
- * @returns {string} - The normalized URL or placeholder if invalid
- */
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
 /**
  * Normalizes image URLs from the backend.

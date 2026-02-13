@@ -1,0 +1,15 @@
+{
+    "short_name": "Thakkalies",
+    "name": "Thakkalies Grocery",
+    "icons": [
+        {
+            "src": "thakkalies_horizontal_logo.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ],
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#006A52",
+    "background_color": "#ffffff"
+}
