@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thakkalies - Fresh Groceries Delivered</title>
+  <!-- Fix for Sensor/Permission Policy warnings -->
+  <meta http-equiv="Permissions-Policy"
+    content="accelerometer=(self), gyroscope=(self), magnetometer=(self), payment=(*)">
+  <!-- Fix for Mixed Content (HTTP on HTTPS) -->
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <link rel="icon" type="image/svg+xml" href="/thakkalies_horizontal_logo.svg" />
+  <link rel="manifest" href="/manifest.json">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>
