@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import {
   ChevronLeft,
   Heart,
-  Share2,
   Star,
   Minus,
   Plus,
@@ -152,9 +151,6 @@ export default function ProductDetailPage({ productId, onNavigate }) {
                       : 'text-[#666666]'
                       }`}
                   />
-                </button>
-                <button className="w-10 h-10 bg-[#F5F5F5] rounded-xl flex items-center justify-center hover:bg-[#E8F5F1] transition-colors">
-                  <Share2 className="w-5 h-5 text-[#666666]" />
                 </button>
               </div>
             </div>
