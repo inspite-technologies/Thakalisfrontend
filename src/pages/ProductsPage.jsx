@@ -97,7 +97,7 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
     } finally {
       setLoading(false);
     }
-  }, [selectedCategory, selectedShop, searchQuery, categories.length, shops.length]);
+  }, [selectedCategory, selectedShop, searchQuery]);
 
   useEffect(() => {
     fetchProducts();
