@@ -2,7 +2,7 @@
     "rewrites": [
         {
             "source": "/api/(.*)",
-            "destination": "https://thakkalies-api.onrender.com/$1"
+            "destination": "http://YOUR_BACKEND_URL_HERE/$1"
         },
         {
             "source": "/(.*)",
