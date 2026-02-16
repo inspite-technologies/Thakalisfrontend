@@ -227,7 +227,7 @@ export default function ProductsPage() {
 
           {/* Filter Sidebar / Drawer */}
           <div className={`
-            fixed lg:static inset-y-0 left-0 z-50 w-[280px] lg:w-64 bg-white lg:bg-transparent shadow-2xl lg:shadow-none 
+            fixed lg:sticky lg:top-24 lg:z-30 lg:h-[calc(100vh-120px)] inset-y-0 left-0 z-50 w-[280px] lg:w-64 bg-white lg:bg-transparent shadow-2xl lg:shadow-none 
             transform transition-transform duration-300 ease-in-out lg:transform-none flex-shrink-0
             ${showFilters ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           `}>
