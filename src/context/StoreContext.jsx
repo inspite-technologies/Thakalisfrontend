@@ -553,6 +553,35 @@ export function StoreProvider({ children }) {
         amount: razorpay.amount / 100 + ' INR'
       });
 
+      console.log('📸 Order items available for potential recovery from backend');
+
+      const restoreCartFromOrder = async (orderItems) => {
+        if (!orderItems || orderItems.length === 0) return;
+        console.log('🔄 Restoring cart using items from backend order...');
+        try {
+          // Flatten items from all vendor orders
+          const itemsToRestore = orderItems.flatMap(vo => vo.items.map(item => ({
+            id: item.productId,
+            quantity: item.quantity
+          })));
+
+          // 1. Add all items back in bulk
+          const productIds = itemsToRestore.map(item => item.id);
+          await addToCartApi(productIds);
+
+          // 2. Update quantities for items with quantity > 1
+          for (const item of itemsToRestore) {
+            if (item.quantity > 1) {
+              await updateCartQuantityApi(item.id, item.quantity);
+            }
+          }
+          await fetchCart();
+          console.log('✅ Cart restored successfully');
+        } catch (err) {
+          console.error('❌ Failed to restore cart:', err);
+        }
+      };
+
       // ═══════════════════════════════════════════════════════════════
       // STEP 2: OPEN RAZORPAY CHECKOUT (Frontend)
       // Frontend handles the payment popup
@@ -561,6 +590,10 @@ export function StoreProvider({ children }) {
       console.log('🔑 Razorpay Key:', razorpay.key); // Debug log
 
       return new Promise((resolve, reject) => {
+        let hasSucceeded = false;
+        let hasFailed = false;
+        let lastError = null;
+
         const options = createRazorpayOptions({
           key: razorpay.key,
           amount: razorpay.amount,
@@ -577,27 +610,12 @@ export function StoreProvider({ children }) {
               // 3. VERIFY PAYMENT (Backend)
               // Backend verifyPayment verifies signature and AUTOMATICALLY empties the cart.
 
-              // ═══════════════════════════════════════════════════════════════
-              // CAPTURE CART SNAPSHOT BEFORE VERIFICATION
-              // This preserves items, quantities, and prices before backend empties cart
-              // ═══════════════════════════════════════════════════════════════
-              const orderedCartSnapshot = {
-                items: cart.map(item => ({
-                  product: { ...item.product },
-                  quantity: item.quantity,
-                  totalPrice: item.product.price * item.quantity
-                })),
-                totalItems: cart.reduce((sum, item) => sum + item.quantity, 0),
-                cartTotalPrice: cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0),
-                status: 'ordered'
-              };
-              console.log('📦 Cart snapshot captured with', orderedCartSnapshot.totalItems, 'items');
-
               console.log('🔐 Verifying payment with backend...');
               const verifyResult = await verifyPaymentApi(response);
 
               if (verifyResult?.success) {
                 console.log('✅ Payment verified!');
+                hasSucceeded = true;
                 const finalOrderId = order._id || order.id || order.orderId;
 
                 // ═══════════════════════════════════════════════════════════════
@@ -680,21 +698,27 @@ export function StoreProvider({ children }) {
           // Backend: paymentFailed() - Marks order failed, restores stock
           // ═══════════════════════════════════════════════════════════
           onDismiss: async function () {
-            console.log('❌ STEP 4: Payment cancelled by user');
-            toast.error('Payment cancelled');
+            console.log('❌ STEP 4: Payment window closed');
 
-            try {
-              // Notify backend about cancellation
-              await paymentFailedApi(razorpay.orderId, 'Payment cancelled by user');
-              console.log('📤 Backend notified of cancellation');
+            if (hasFailed || !hasSucceeded) {
+              const errorToReport = hasFailed ? (lastError || 'Payment failed') : 'Payment cancelled';
 
-              // Refresh cart (backend restores stock)
-              await fetchCart();
-            } catch (err) {
-              console.error('Failed to report cancellation:', err);
+              if (!hasFailed) toast.error('Payment cancelled');
+
+              try {
+                // 1. Notify backend
+                await paymentFailedApi(razorpay.orderId, errorToReport);
+
+                // 2. RESTORE CART FROM BACKEND ORDER DATA
+                await restoreCartFromOrder(order.vendorOrders);
+
+              } catch (err) {
+                console.error('Failed to handle payment failure/cancellation:', err);
+              }
+
+              reject(new Error(errorToReport));
+              return;
             }
-
-            reject(new Error('Payment cancelled'));
           }
         });
 
@@ -711,18 +735,14 @@ export function StoreProvider({ children }) {
           console.log('❌ STEP 4: Payment failed -', errorMsg);
           toast.error(errorMsg);
 
+          hasFailed = true;
+          lastError = errorMsg;
+
           try {
-            // Notify backend about failure
             await paymentFailedApi(razorpay.orderId, errorMsg);
-            console.log('📤 Backend notified of payment failure');
+          } catch (e) { }
 
-            // Refresh cart (backend restores stock)
-            await fetchCart();
-          } catch (err) {
-            console.error('Failed to report payment failure:', err);
-          }
-
-          reject(new Error('Payment failed: ' + errorMsg));
+          rzp.close();
         });
 
         rzp.open();

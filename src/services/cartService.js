@@ -14,8 +14,9 @@ export const fetchCartItems = async () => {
  * Add product to cart
  * @param {string} productId - Product ID to add
  */
-export const addToCartApi = async (productId) => {
-    const response = await api.post('/cart', { productIds: [productId] });
+export const addToCartApi = async (productIdOrIds) => {
+    const productIds = Array.isArray(productIdOrIds) ? productIdOrIds : [productIdOrIds];
+    const response = await api.post('/cart', { productIds });
     return response.data;
 };
 

@@ -193,7 +193,7 @@ export default function OrderDetailPage() {
                 {order.items?.map((item, index) => {
                   const productId = item.productId || item.product?._id || item.product?.id;
                   const itemStatus = item.status || 'Pending';
-                  const canCancel = itemStatus === 'Pending' || itemStatus === 'Accepted';
+                  const canCancel = itemStatus === 'Pending';
                   const isCancelling = cancellingProducts[productId];
 
                   return (
