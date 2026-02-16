@@ -12,53 +12,55 @@ import {
   Mail,
   LogIn
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext.jsx';
 import { toast } from '../components/ui/sonner';
 
-export default function ProfilePage({ onNavigate }) {
+export default function ProfilePage() {
+  const navigate = useNavigate();
   const { user, logout, isLoggedIn, isGuest } = useStore();
 
   const handleLogout = () => {
     logout();
     toast.success('Logged out successfully');
-    onNavigate('home');
+    navigate('/');
   };
 
   const registeredMenuItems = [
     {
       icon: Edit3,
       label: 'Edit Profile',
-      onClick: () => onNavigate('edit-profile'),
+      onClick: () => navigate('/edit-profile'),
       description: 'Update your personal information',
     },
     {
       icon: MapPin,
       label: 'Saved Addresses',
-      onClick: () => onNavigate('addresses'),
+      onClick: () => navigate('/addresses'),
       description: 'Manage your delivery addresses',
     },
     {
       icon: ShoppingBag,
       label: 'My Orders',
-      onClick: () => onNavigate('orders'),
+      onClick: () => navigate('/orders'),
       description: 'View your order history',
     },
     {
       icon: Gift,
       label: 'Rewards',
-      onClick: () => onNavigate('rewards'),
+      onClick: () => navigate('/rewards'),
       description: 'Check your reward points',
     },
     {
       icon: Users,
       label: 'Refer & Earn',
-      onClick: () => onNavigate('refer-earn'),
+      onClick: () => navigate('/refer-earn'),
       description: 'Invite friends and earn rewards',
     },
     {
       icon: Heart,
       label: 'Wishlist',
-      onClick: () => onNavigate('wishlist'),
+      onClick: () => navigate('/wishlist'),
       description: 'Your saved products',
     },
   ];
@@ -69,7 +71,7 @@ export default function ProfilePage({ onNavigate }) {
       label: 'Saved Addresses',
       onClick: () => {
         toast.error('Please login to manage addresses');
-        onNavigate('login');
+        navigate('/login');
       },
       description: 'Manage your delivery addresses',
     },
@@ -78,14 +80,14 @@ export default function ProfilePage({ onNavigate }) {
       label: 'My Orders',
       onClick: () => {
         toast.error('Please login to view orders');
-        onNavigate('login');
+        navigate('/login');
       },
       description: 'View your order history',
     },
     {
       icon: Heart,
       label: 'Wishlist',
-      onClick: () => onNavigate('wishlist'),
+      onClick: () => navigate('/wishlist'),
       description: 'Your saved products',
     },
   ];
@@ -160,7 +162,7 @@ export default function ProfilePage({ onNavigate }) {
         {/* Login/Logout Button */}
         {isGuest ? (
           <button
-            onClick={() => onNavigate('login')}
+            onClick={() => navigate('/login')}
             className="w-full mt-6 flex items-center gap-4 p-4 bg-white rounded-2xl shadow-sm hover:bg-[#E8F5F1] active:scale-[0.99] transition-all animate-fade-in-up"
             style={{ animationDelay: '0.2s' }}
           >

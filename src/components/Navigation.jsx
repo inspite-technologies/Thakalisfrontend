@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Search,
   Heart,
@@ -23,7 +24,7 @@ import {
 } from './ui/dropdown-menu.jsx';
 import { searchProductsApi, fetchAllProductsApi } from '../services/productService';
 
-export default function Navigation({ onNavigate, currentPage }) {
+export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -31,6 +32,8 @@ export default function Navigation({ onNavigate, currentPage }) {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [allStores, setAllStores] = useState([]);
   const { logout, cartCount, wishlist, isLoggedIn, isRegistered, deliveryLocation, setDeliveryLocation } = useStore();
+  const navigate = useNavigate();
+  const location = useLocation();
 
 
   useEffect(() => {
@@ -89,24 +92,24 @@ export default function Navigation({ onNavigate, currentPage }) {
     e.preventDefault();
     if (searchQuery.trim()) {
       setShowSearchResults(false);
-      onNavigate('products', { searchQuery: searchQuery });
+      navigate(`/products?search=${encodeURIComponent(searchQuery)}`);
     }
   };
 
   const handleProductClick = (productId) => {
     setShowSearchResults(false);
-    onNavigate('product-detail', { productId });
+    navigate(`/product/${productId}`);
   };
 
   const handleStoreClick = (storeId) => {
     setShowSearchResults(false);
-    onNavigate('products', { storeId });
+    navigate(`/products?storeId=${storeId}`);
   };
 
   const navLinks = [
-    { label: 'Home', page: 'home' },
-    { label: 'Products', page: 'products' },
-    { label: 'Orders', page: 'orders' },
+    { label: 'Home', path: '/' },
+    { label: 'Products', path: '/products' },
+    { label: 'Orders', path: '/orders' },
   ];
 
   return (
@@ -118,8 +121,8 @@ export default function Navigation({ onNavigate, currentPage }) {
     >
       <div className="section-container">
         <div className="flex items-center justify-between h-20">
-          <button
-            onClick={() => onNavigate('home')}
+          <Link
+            to="/"
             className="flex items-center group h-12"
           >
             <img
@@ -127,7 +130,7 @@ export default function Navigation({ onNavigate, currentPage }) {
               alt="Thakkalies"
               className="h-full w-auto object-contain transition-transform duration-300 group-hover:scale-105"
             />
-          </button>
+          </Link>
 
           <div className="hidden lg:flex items-center gap-2 ml-8">
             <MapPin className="w-4 h-4 text-[#006A52]" />
@@ -257,10 +260,10 @@ export default function Navigation({ onNavigate, currentPage }) {
               onClick={() => {
                 if (!isRegistered) {
                   toast.error('Please login to view wishlist');
-                  onNavigate('login');
+                  navigate('/login');
                   return;
                 }
-                onNavigate('wishlist');
+                navigate('/wishlist');
               }}
               className="relative p-2.5 text-[#666666] hover:text-[#006A52] hover:bg-[#E8F5F1] rounded-xl transition-all duration-300"
             >
@@ -276,10 +279,10 @@ export default function Navigation({ onNavigate, currentPage }) {
               onClick={() => {
                 if (!isRegistered) {
                   toast.error('Please login to view cart');
-                  onNavigate('login');
+                  navigate('/login');
                   return;
                 }
-                onNavigate('cart');
+                navigate('/cart');
               }}
               className="relative p-2.5 text-[#666666] hover:text-[#006A52] hover:bg-[#E8F5F1] rounded-xl transition-all duration-300"
             >
@@ -301,26 +304,26 @@ export default function Navigation({ onNavigate, currentPage }) {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => onNavigate('profile')}>
+                  <DropdownMenuItem onClick={() => navigate('/profile')}>
                     Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onNavigate('orders')}>
+                  <DropdownMenuItem onClick={() => navigate('/orders')}>
                     My Orders
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onNavigate('addresses')}>
+                  <DropdownMenuItem onClick={() => navigate('/addresses')}>
                     Saved Addresses
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onNavigate('rewards')}>
+                  <DropdownMenuItem onClick={() => navigate('/rewards')}>
                     Rewards
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onNavigate('refer-earn')}>
+                  <DropdownMenuItem onClick={() => navigate('/refer-earn')}>
                     Refer & Earn
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => {
                       logout();
                       toast.success('Logged out successfully');
-                      onNavigate('home');
+                      navigate('/');
                     }}
                     className="text-red-600 focus:text-red-700 font-medium"
                   >
@@ -330,7 +333,7 @@ export default function Navigation({ onNavigate, currentPage }) {
               </DropdownMenu>
             ) : (
               <Button
-                onClick={() => onNavigate('login')}
+                onClick={() => navigate('/login')}
                 className="btn-primary"
               >
                 Login
@@ -368,24 +371,22 @@ export default function Navigation({ onNavigate, currentPage }) {
             <div className="section-container py-4">
               <div className="flex flex-col gap-2">
                 {navLinks.map((link) => (
-                  <button
-                    key={link.page}
-                    onClick={() => {
-                      onNavigate(link.page);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={`px-4 py-3 text-left rounded-xl transition-colors ${currentPage === link.page
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`px-4 py-3 text-left rounded-xl transition-colors ${location.pathname === link.path
                       ? 'bg-[#E8F5F1] text-[#006A52] font-medium'
                       : 'text-[#1A1A1A] hover:bg-[#F5F5F5]'
                       }`}
                   >
                     {link.label}
-                  </button>
+                  </Link>
                 ))}
                 {!isRegistered ? (
                   <Button
                     onClick={() => {
-                      onNavigate('login');
+                      navigate('/login');
                       setIsMobileMenuOpen(false);
                     }}
                     className="btn-primary mt-2"
@@ -395,23 +396,25 @@ export default function Navigation({ onNavigate, currentPage }) {
                 ) : (
                   <>
                     <div className="h-px bg-[#E5E5E5] my-2"></div>
-                    <button
-                      onClick={() => { onNavigate('profile'); setIsMobileMenuOpen(false); }}
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsMobileMenuOpen(false)}
                       className="px-4 py-3 text-left text-[#1A1A1A] hover:bg-[#F5F5F5] rounded-xl transition-colors flex items-center gap-2"
                     >
                       <User className="w-4 h-4" /> Profile
-                    </button>
-                    <button
-                      onClick={() => { onNavigate('addresses'); setIsMobileMenuOpen(false); }}
+                    </Link>
+                    <Link
+                      to="/addresses"
+                      onClick={() => setIsMobileMenuOpen(false)}
                       className="px-4 py-3 text-left text-[#1A1A1A] hover:bg-[#F5F5F5] rounded-xl transition-colors flex items-center gap-2"
                     >
                       <MapPin className="w-4 h-4" /> Saved Addresses
-                    </button>
+                    </Link>
                     <button
                       onClick={() => {
                         logout();
                         toast.success('Logged out successfully');
-                        onNavigate('home');
+                        navigate('/');
                         setIsMobileMenuOpen(false);
                       }}
                       className="px-4 py-3 text-left text-red-600 hover:bg-[#FFF3ED] rounded-xl transition-colors font-medium flex items-center gap-2"

@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Phone, ArrowRight, ChevronLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button.jsx';
 import { Input } from '../components/ui/input.jsx';
 import { useStore } from '../context/StoreContext.jsx';
 import { toast } from '../components/ui/sonner';
 
-export default function LoginPage({ onNavigate }) {
+export default function LoginPage() {
+  const navigate = useNavigate();
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState('phone');
@@ -41,7 +43,7 @@ export default function LoginPage({ onNavigate }) {
     setIsLoading(false);
     if (success) {
       toast.success('Login successful!');
-      onNavigate('home');
+      navigate('/');
     } else {
       toast.error('Invalid OTP. Please try again.');
     }
@@ -51,7 +53,7 @@ export default function LoginPage({ onNavigate }) {
     <div className="min-h-screen bg-gradient-to-br from-[#E8F5F1] via-white to-[#FFF3ED] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <button
-          onClick={() => onNavigate('home')}
+          onClick={() => navigate('/')}
           className="mb-6 flex items-center gap-2 text-[#666666] hover:text-[#006A52] transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />

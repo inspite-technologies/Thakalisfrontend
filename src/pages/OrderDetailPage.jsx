@@ -1,5 +1,6 @@
 import { ChevronLeft, MapPin, Package, CreditCard, Truck, Check, X } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useStore, normalizeOrders } from '../context/StoreContext.jsx';
 import { Button } from '../components/ui/button.jsx';
 import { normalizeImageUrl } from '../utils/utils.js';
@@ -21,7 +22,9 @@ const statusLabels = {
   Rejected: 'Rejected',
 };
 
-export default function OrderDetailPage({ orderId, onNavigate }) {
+export default function OrderDetailPage() {
+  const { orderId } = useParams();
+  const navigate = useNavigate();
   const { orders, setOrders } = useStore();
   const order = orders.find((o) => o.id === orderId);
   const [cancellingProducts, setCancellingProducts] = useState({});
@@ -97,7 +100,7 @@ export default function OrderDetailPage({ orderId, onNavigate }) {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-[#1A1A1A] mb-2">Order not found</h2>
-          <Button onClick={() => onNavigate('orders')} className="btn-primary">
+          <Button onClick={() => navigate('/orders')} className="btn-primary">
             Back to Orders
           </Button>
         </div>
@@ -110,7 +113,7 @@ export default function OrderDetailPage({ orderId, onNavigate }) {
       <div className="bg-white border-b border-[#E5E5E5]">
         <div className="section-container py-4">
           <button
-            onClick={() => onNavigate('orders')}
+            onClick={() => navigate('/orders')}
             className="flex items-center gap-2 text-[#666666] hover:text-[#006A52] transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />

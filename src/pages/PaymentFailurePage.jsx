@@ -1,7 +1,10 @@
 import { AlertCircle, ArrowRight, ShieldAlert, RefreshCw, MessageCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button.jsx';
 
-export default function PaymentFailurePage({ onNavigate }) {
+export default function PaymentFailurePage() {
+    const navigate = useNavigate();
+
     return (
         <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center p-4">
             <div className="w-full max-w-lg bg-white rounded-2xl shadow-sm border border-[#E5E5E5] overflow-hidden">
@@ -40,7 +43,7 @@ export default function PaymentFailurePage({ onNavigate }) {
 
                     <div className="space-y-3">
                         <Button
-                            onClick={() => onNavigate('cart')}
+                            onClick={() => navigate('/cart')}
                             className="w-full btn-primary h-12 text-base shadow-md hover:shadow-lg transition-all"
                         >
                             <RefreshCw className="w-4 h-4 mr-2" />
@@ -49,7 +52,7 @@ export default function PaymentFailurePage({ onNavigate }) {
 
                         <div className="grid grid-cols-1">
                             <Button
-                                onClick={() => onNavigate('home')}
+                                onClick={() => navigate('/')}
                                 variant="outline"
                                 className="w-full border-[#E5E5E5] text-[#666666] hover:text-[#1A1A1A] hover:bg-[#F5F5F5]"
                             >

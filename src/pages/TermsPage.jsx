@@ -1,6 +1,8 @@
 import { ScrollText, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-export default function TermsPage({ onNavigate }) {
+export default function TermsPage() {
+    const navigate = useNavigate();
     return (
         <div className="min-h-screen bg-[#FAFAFA] pt-24 pb-12">
             <div className="section-container">
@@ -8,7 +10,7 @@ export default function TermsPage({ onNavigate }) {
                 {/* Header */}
                 <div className="max-w-4xl mx-auto mb-8">
                     <button
-                        onClick={() => onNavigate('home')}
+                        onClick={() => navigate('/')}
                         className="flex items-center gap-2 text-[#666666] hover:text-[#006A52] transition-colors mb-6"
                     >
                         <ArrowLeft className="w-5 h-5" />

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, Truck, Package, Check, Phone, MessageCircle } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useStore } from '../context/StoreContext.jsx';
 import { Button } from '../components/ui/button.jsx';
 
@@ -10,38 +11,30 @@ const trackingSteps = [
   { status: 'Delivered', description: 'Order delivered successfully', icon: Check },
 ];
 
-export default function OrderTrackingPage({ orderId, onNavigate }) {
+export default function OrderTrackingPage() {
+  const { orderId } = useParams();
+  const navigate = useNavigate();
   const { orders } = useStore();
-  const [currentStep, setCurrentStep] = useState(2);
   const order = orders.find((o) => o.id === orderId);
 
-  useEffect(() => {
-    if (order) {
-      switch (order.status) {
-        case 'confirmed':
-          setCurrentStep(0);
-          break;
-        case 'packed':
-          setCurrentStep(1);
-          break;
-        case 'out_for_delivery':
-          setCurrentStep(2);
-          break;
-        case 'delivered':
-          setCurrentStep(3);
-          break;
-        default:
-          setCurrentStep(0);
-      }
+  const getStepFromStatus = (status) => {
+    switch (status) {
+      case 'confirmed': return 0;
+      case 'packed': return 1;
+      case 'out_for_delivery': return 2;
+      case 'delivered': return 3;
+      default: return 0;
     }
-  }, [order]);
+  };
+
+  const currentStep = order ? getStepFromStatus(order.status) : 2;
 
   if (!order) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-[#1A1A1A] mb-2">Order not found</h2>
-          <Button onClick={() => onNavigate('orders')} className="btn-primary">
+          <Button onClick={() => navigate('/orders')} className="btn-primary">
             Back to Orders
           </Button>
         </div>
@@ -54,7 +47,7 @@ export default function OrderTrackingPage({ orderId, onNavigate }) {
       <div className="bg-white border-b border-[#E5E5E5]">
         <div className="section-container py-4">
           <button
-            onClick={() => onNavigate('orders')}
+            onClick={() => navigate('/orders')}
             className="flex items-center gap-2 text-[#666666] hover:text-[#006A52] transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />

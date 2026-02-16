@@ -1,6 +1,7 @@
 import { Facebook, Instagram, Twitter, Youtube, CreditCard, Truck, Shield, Headphones } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-export default function Footer({ onNavigate }) {
+export default function Footer() {
   const features = [
     { icon: Truck, title: 'Free Delivery', description: 'On orders above ₹299' },
     { icon: Shield, title: 'Fresh Guaranteed', description: '100% quality assurance' },
@@ -10,14 +11,14 @@ export default function Footer({ onNavigate }) {
 
   const footerLinks = {
     support: [
-      { label: 'Terms & Conditions', onClick: () => onNavigate('terms') },
-      { label: 'Privacy Policy', onClick: () => onNavigate('privacy-policy') },
+      { label: 'Terms & Conditions', path: '/terms' },
+      { label: 'Privacy Policy', path: '/privacy-policy' },
     ],
     quickLinks: [
-      { label: 'My Account', onClick: () => onNavigate('profile') },
-      { label: 'My Orders', onClick: () => onNavigate('orders') },
-      { label: 'Wishlist', onClick: () => onNavigate('wishlist') },
-      { label: 'Rewards', onClick: () => onNavigate('rewards') },
+      { label: 'My Account', path: '/profile' },
+      { label: 'My Orders', path: '/orders' },
+      { label: 'Wishlist', path: '/wishlist' },
+      { label: 'Rewards', path: '/rewards' },
     ],
   };
 
@@ -83,13 +84,13 @@ export default function Footer({ onNavigate }) {
             <ul className="space-y-4">
               {footerLinks.quickLinks.map((link) => (
                 <li key={link.label}>
-                  <button
-                    onClick={link.onClick}
+                  <Link
+                    to={link.path}
                     className="text-white/60 hover:text-[#006A52] hover:translate-x-1 transition-all duration-300 flex items-center gap-2"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-white/20"></span>
                     {link.label}
-                  </button>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -100,23 +101,13 @@ export default function Footer({ onNavigate }) {
             <ul className="space-y-4">
               {footerLinks.support.map((link) => (
                 <li key={link.label}>
-                  {link.onClick ? (
-                    <button
-                      onClick={link.onClick}
-                      className="text-white/60 hover:text-[#006A52] hover:translate-x-1 transition-all duration-300 flex items-center gap-2"
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-white/20"></span>
-                      {link.label}
-                    </button>
-                  ) : (
-                    <a
-                      href={link.href}
-                      className="text-white/60 hover:text-[#006A52] hover:translate-x-1 transition-all duration-300 flex items-center gap-2"
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-white/20"></span>
-                      {link.label}
-                    </a>
-                  )}
+                  <Link
+                    to={link.path}
+                    className="text-white/60 hover:text-[#006A52] hover:translate-x-1 transition-all duration-300 flex items-center gap-2"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/20"></span>
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>

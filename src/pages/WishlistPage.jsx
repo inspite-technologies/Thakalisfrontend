@@ -1,11 +1,13 @@
 import { Heart, ShoppingCart, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext.jsx';
-import { products } from '../data/mockData.js';
+import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button.jsx';
 import { toast } from '../components/ui/sonner';
 import { normalizeImageUrl } from '../utils/utils.js';
 
-export default function WishlistPage({ onNavigate }) {
+export default function WishlistPage() {
+  const navigate = useNavigate();
   const { wishlist, toggleWishlist, addToCart, isRegistered } = useStore();
 
   const wishlistProducts = wishlist;
@@ -13,7 +15,7 @@ export default function WishlistPage({ onNavigate }) {
   const handleAddToCart = (product) => {
     if (!isRegistered) {
       toast.error('Please login to add to cart');
-      onNavigate('login');
+      navigate('/login');
       return;
     }
     addToCart(product, 1);
@@ -32,7 +34,7 @@ export default function WishlistPage({ onNavigate }) {
           </div>
           <h2 className="text-2xl font-bold text-[#1A1A1A] mb-2">Your wishlist is empty</h2>
           <p className="text-[#666666] mb-6">Save products you love for later</p>
-          <Button onClick={() => onNavigate('products')} className="btn-primary">
+          <Button onClick={() => navigate('/products')} className="btn-primary">
             Browse Products
           </Button>
         </div>
@@ -59,7 +61,7 @@ export default function WishlistPage({ onNavigate }) {
             >
               <div
                 className="relative aspect-square bg-[#F5F5F5] overflow-hidden cursor-pointer"
-                onClick={() => onNavigate('product-detail', { productId: product.id })}
+                onClick={() => navigate(`/product/${product.id}`)}
               >
                 <img
                   src={normalizeImageUrl(product.image)}
@@ -84,7 +86,7 @@ export default function WishlistPage({ onNavigate }) {
               <div className="p-4">
                 <h3
                   className="font-medium text-[#1A1A1A] line-clamp-2 mb-2 cursor-pointer hover:text-[#006A52] transition-colors"
-                  onClick={() => onNavigate('product-detail', { productId: product.id })}
+                  onClick={() => navigate(`/product/${product.id}`)}
                 >
                   {product.name}
                 </h3>
@@ -107,7 +109,7 @@ export default function WishlistPage({ onNavigate }) {
 
         <div className="mt-8 text-center">
           <Button
-            onClick={() => onNavigate('products')}
+            onClick={() => navigate('/products')}
             variant="outline"
             className="border-[#006A52] text-[#006A52] hover:bg-[#E8F5F1]"
           >

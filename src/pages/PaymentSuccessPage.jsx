@@ -1,21 +1,29 @@
 import { CheckCircle, ShoppingBag, ArrowRight, Truck, Calendar, MapPin } from 'lucide-react';
 import { Button } from '../components/ui/button.jsx';
 import { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-export default function PaymentSuccessPage({ orderId, onNavigate }) {
+export default function PaymentSuccessPage() {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const orderId = location.state?.orderId;
     const [countdown, setCountdown] = useState(5);
 
     useEffect(() => {
+        if (!orderId) {
+            navigate('/');
+            return;
+        }
         if (countdown <= 0) return;
         const timer = setTimeout(() => setCountdown((prev) => prev - 1), 1000);
         return () => clearTimeout(timer);
-    }, [countdown]);
+    }, [countdown, orderId, navigate]);
 
     useEffect(() => {
-        if (countdown === 0) {
-            onNavigate('order-detail', { orderId });
+        if (countdown === 0 && orderId) {
+            navigate(`/order/${orderId}`);
         }
-    }, [countdown, orderId, onNavigate]);
+    }, [countdown, orderId, navigate]);
 
     return (
         <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center p-4">
@@ -51,7 +59,7 @@ export default function PaymentSuccessPage({ orderId, onNavigate }) {
 
                     <div className="space-y-3">
                         <Button
-                            onClick={() => onNavigate('order-detail', { orderId })}
+                            onClick={() => navigate(`/order/${orderId}`)}
                             className="w-full btn-primary h-12 text-base shadow-md hover:shadow-lg transition-all"
                         >
                             <ShoppingBag className="w-4 h-4 mr-2" />
@@ -59,7 +67,7 @@ export default function PaymentSuccessPage({ orderId, onNavigate }) {
                         </Button>
 
                         <Button
-                            onClick={() => onNavigate('home')}
+                            onClick={() => navigate('/')}
                             variant="outline"
                             className="w-full border-[#E5E5E5] text-[#666666] hover:text-[#006A52] hover:border-[#006A52] hover:bg-[#E8F5F1]"
                         >

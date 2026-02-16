@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { ChevronLeft, MapPin, Home, Briefcase, MapPinned } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { getCurrentPosition, getAddressFromCoords } from '../services/locationService';
 import { useStore } from '../context/StoreContext.jsx';
 import { Button } from '../components/ui/button.jsx';
 import { Input } from '../components/ui/input.jsx';
 import { toast } from '../components/ui/sonner';
 
-export default function AddAddressPage({ onNavigate }) {
+export default function AddAddressPage() {
+  const navigate = useNavigate();
   const { addAddress } = useStore();
   const [addressType, setAddressType] = useState('home');
   const [name, setName] = useState('');
@@ -44,7 +46,7 @@ export default function AddAddressPage({ onNavigate }) {
 
       if (success) {
         toast.success('Address saved successfully!');
-        onNavigate('addresses');
+        navigate('/addresses');
       }
     } catch (error) {
       toast.error('Failed to save address');
@@ -58,7 +60,7 @@ export default function AddAddressPage({ onNavigate }) {
       <div className="bg-white border-b border-[#E5E5E5]">
         <div className="section-container py-4">
           <button
-            onClick={() => onNavigate('addresses')}
+            onClick={() => navigate('/addresses')}
             className="flex items-center gap-2 text-[#666666] hover:text-[#006A52] transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -217,7 +219,7 @@ export default function AddAddressPage({ onNavigate }) {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => onNavigate('addresses')}
+                onClick={() => navigate('/addresses')}
                 className="flex-1 py-4 h-14"
               >
                 Cancel

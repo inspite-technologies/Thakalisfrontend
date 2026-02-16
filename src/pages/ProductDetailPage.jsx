@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   ChevronLeft,
   Heart,
@@ -20,7 +21,9 @@ import { normalizeImageUrl } from '../utils/utils.js';
 
 import api from '../api/axios';
 
-export default function ProductDetailPage({ productId, onNavigate }) {
+export default function ProductDetailPage() {
+  const { productId } = useParams();
+  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -85,7 +88,7 @@ export default function ProductDetailPage({ productId, onNavigate }) {
   const handleAddToCart = () => {
     if (!isRegistered) {
       toast.error('Please login to add to cart');
-      onNavigate('login');
+      navigate('/login');
       return;
     }
     addToCart(product, quantity);
@@ -94,7 +97,7 @@ export default function ProductDetailPage({ productId, onNavigate }) {
   const handleToggleWishlist = () => {
     if (!isRegistered) {
       toast('Please login to add to wishlist');
-      onNavigate('login');
+      navigate('/login');
       return;
     }
     toggleWishlist(product);
@@ -105,7 +108,7 @@ export default function ProductDetailPage({ productId, onNavigate }) {
       <div className="bg-white border-b border-[#E5E5E5]">
         <div className="section-container py-4">
           <button
-            onClick={() => onNavigate('products')}
+            onClick={() => navigate('/products')}
             className="flex items-center gap-2 text-[#666666] hover:text-[#006A52] transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -253,7 +256,7 @@ export default function ProductDetailPage({ productId, onNavigate }) {
                 <div
                   key={relatedProduct.id}
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer group"
-                  onClick={() => onNavigate('product-detail', { productId: relatedProduct.id })}
+                  onClick={() => navigate(`/product/${relatedProduct.id}`)}
                 >
                   <div className="relative aspect-square bg-[#F5F5F5] overflow-hidden">
                     <img

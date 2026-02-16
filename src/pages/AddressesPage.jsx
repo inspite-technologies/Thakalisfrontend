@@ -1,4 +1,5 @@
 import { MapPin, Plus, ChevronLeft, Home, Briefcase, MapPinned } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext.jsx';
 import { Button } from '../components/ui/button.jsx';
 
@@ -8,7 +9,8 @@ const typeIcons = {
   other: MapPinned,
 };
 
-export default function AddressesPage({ onNavigate }) {
+export default function AddressesPage() {
+  const navigate = useNavigate();
   const { addresses, setDefaultAddress, deleteAddress } = useStore();
 
   return (
@@ -16,7 +18,7 @@ export default function AddressesPage({ onNavigate }) {
       <div className="bg-white border-b border-[#E5E5E5]">
         <div className="section-container py-4">
           <button
-            onClick={() => onNavigate('profile')}
+            onClick={() => navigate('/profile')}
             className="flex items-center gap-2 text-[#666666] hover:text-[#006A52] transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -29,7 +31,7 @@ export default function AddressesPage({ onNavigate }) {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">Saved Addresses</h1>
           <Button
-            onClick={() => onNavigate('add-address')}
+            onClick={() => navigate('/add-address')}
             className="btn-primary flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
@@ -45,7 +47,7 @@ export default function AddressesPage({ onNavigate }) {
             <h3 className="text-lg font-medium text-[#1A1A1A] mb-2">No saved addresses</h3>
             <p className="text-[#666666] mb-6">Add your first address to get started</p>
             <Button
-              onClick={() => onNavigate('add-address')}
+              onClick={() => navigate('/add-address')}
               className="btn-primary"
             >
               <Plus className="w-4 h-4 mr-2" />

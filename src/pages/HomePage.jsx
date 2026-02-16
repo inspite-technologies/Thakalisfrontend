@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   ChevronLeft,
   ChevronRight,
@@ -21,7 +22,8 @@ import { toast } from '../components/ui/sonner';
 import { normalizeImageUrl } from '../utils/utils.js';
 import api from '../api/axios';
 
-export default function HomePage({ onNavigate }) {
+export default function HomePage() {
+  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [banners, setBanners] = useState([]);
@@ -104,7 +106,7 @@ export default function HomePage({ onNavigate }) {
   const handleAddToCart = (product) => {
     if (!isRegistered) {
       toast.error('Please login to add to cart');
-      onNavigate('login');
+      navigate('/login');
       return;
     }
     addToCart(product, 1);
@@ -122,7 +124,7 @@ export default function HomePage({ onNavigate }) {
   const handleToggleWishlist = (product) => {
     if (!isRegistered) {
       toast('Please login to add to wishlist');
-      onNavigate('login');
+      navigate('/login');
       return;
     }
     toggleWishlist(product);
@@ -209,7 +211,7 @@ export default function HomePage({ onNavigate }) {
               return (
                 <button
                   key={category._id}
-                  onClick={() => onNavigate('products', { categoryId: category._id })}
+                  onClick={() => navigate(`/products?categoryId=${category._id}`)}
                   className="flex flex-col items-center gap-3 group flex-shrink-0"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
@@ -242,7 +244,7 @@ export default function HomePage({ onNavigate }) {
               <p className="text-[#666666] mt-1">Handpicked favorites just for you</p>
             </div>
             <Button
-              onClick={() => onNavigate('products')}
+              onClick={() => navigate('/products')}
               variant="outline"
               className="hidden md:flex items-center gap-2 border-[#006A52] text-[#006A52] hover:bg-[#E8F5F1]"
             >
@@ -257,7 +259,7 @@ export default function HomePage({ onNavigate }) {
               return (
                 <div
                   key={product.id}
-                  onClick={() => onNavigate('product-detail', { productId: product.id })}
+                  onClick={() => navigate(`/product/${product.id}`)}
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
@@ -290,7 +292,7 @@ export default function HomePage({ onNavigate }) {
                   <div className="p-4">
                     <h3
                       className="font-medium text-[#1A1A1A] line-clamp-2 mb-2 cursor-pointer hover:text-[#006A52] transition-colors text-sm md:text-base"
-                      onClick={() => onNavigate('product-detail', { productId: product.id })}
+                      onClick={() => navigate(`/product/${product.id}`)}
                     >
                       {product.name}
                     </h3>
@@ -347,7 +349,7 @@ export default function HomePage({ onNavigate }) {
 
           <div className="mt-6 text-center md:hidden">
             <Button
-              onClick={() => onNavigate('products')}
+              onClick={() => navigate('/products')}
               variant="outline"
               className="border-[#006A52] text-[#006A52] hover:bg-[#E8F5F1]"
             >

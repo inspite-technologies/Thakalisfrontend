@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Search, Filter, Star, Plus, Minus, Heart, Clock, ChevronDown, X, ShoppingBag, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useStore } from '../context/StoreContext.jsx';
 import { toast } from '../components/ui/sonner';
@@ -6,11 +7,17 @@ import { normalizeImageUrl } from '../utils/utils.js';
 
 import api from '../api/axios';
 
-export default function ProductsPage({ onNavigate, initialCategoryId, initialStoreId, initialSearchQuery }) {
+export default function ProductsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [shops, setShops] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const initialCategoryId = searchParams.get('categoryId');
+  const initialStoreId = searchParams.get('storeId');
+  const initialSearchQuery = searchParams.get('search');
 
   const [selectedCategory, setSelectedCategory] = useState(initialCategoryId || 'all');
   const [selectedShop, setSelectedShop] = useState(initialStoreId || 'all');
@@ -23,19 +30,36 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
 
   const { addToCart, toggleWishlist, isInWishlist, cart, updateQuantity, isLoggedIn, isRegistered } = useStore();
 
-  // Update selection if initial props change
+  // Update selection if URL params change
   useEffect(() => {
     setSelectedCategory(initialCategoryId || 'all');
     setSelectedShop(initialStoreId || 'all');
-    // Ensure we reset to empty string if undefined/null to clear previous search
     setSearchQuery(initialSearchQuery || '');
     setCurrentPage(1);
   }, [initialCategoryId, initialStoreId, initialSearchQuery]);
 
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory, selectedShop, searchQuery]);
+  // Update URL when filters change
+  const updateUrlParams = (updates) => {
+    const newParams = new URLSearchParams(searchParams);
+
+    if (updates.category) {
+      if (updates.category === 'all') newParams.delete('categoryId');
+      else newParams.set('categoryId', updates.category);
+    }
+
+    if (updates.store) {
+      if (updates.store === 'all') newParams.delete('storeId');
+      else newParams.set('storeId', updates.store);
+    }
+
+    if (updates.search !== undefined) {
+      if (!updates.search) newParams.delete('search');
+      else newParams.set('search', updates.search);
+    }
+
+    setSearchParams(newParams);
+  };
+
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -151,7 +175,7 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
   const handleAddToCart = (product) => {
     if (!isRegistered) {
       toast.error('Please login to add to cart');
-      onNavigate('login');
+      navigate('/login');
       return;
     }
     if (product.stock <= 0) {
@@ -174,7 +198,7 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
   const handleToggleWishlist = (product) => {
     if (!isRegistered) {
       toast('Please login to add to wishlist');
-      onNavigate('login');
+      navigate('/login');
       return;
     }
     toggleWishlist(product);
@@ -222,7 +246,7 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
                 <h4 className="text-sm font-medium text-[#666666] mb-3">Categories</h4>
                 <div className="space-y-2">
                   <button
-                    onClick={() => { setSelectedCategory('all'); setShowFilters(false); }}
+                    onClick={() => { updateUrlParams({ category: 'all' }); setShowFilters(false); }}
                     className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedCategory === 'all'
                       ? 'bg-[#E8F5F1] text-[#006A52] font-medium'
                       : 'text-[#1A1A1A] hover:bg-[#F5F5F5]'
@@ -233,7 +257,7 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
                   {categories.map((category) => (
                     <button
                       key={category.id}
-                      onClick={() => { setSelectedCategory(category.id); setShowFilters(false); }}
+                      onClick={() => { updateUrlParams({ category: category.id }); setShowFilters(false); }}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedCategory === category.id
                         ? 'bg-[#E8F5F1] text-[#006A52] font-medium'
                         : 'text-[#1A1A1A] hover:bg-[#F5F5F5]'
@@ -249,7 +273,7 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
                 <h4 className="text-sm font-medium text-[#666666] mb-3">Stores</h4>
                 <div className="space-y-2">
                   <button
-                    onClick={() => { setSelectedShop('all'); setShowFilters(false); }}
+                    onClick={() => { updateUrlParams({ store: 'all' }); setShowFilters(false); }}
                     className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedShop === 'all'
                       ? 'bg-[#E8F5F1] text-[#006A52] font-medium'
                       : 'text-[#1A1A1A] hover:bg-[#F5F5F5]'
@@ -260,7 +284,7 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
                   {shops.map((shop) => (
                     <button
                       key={shop.id}
-                      onClick={() => { setSelectedShop(shop.id); setShowFilters(false); }}
+                      onClick={() => { updateUrlParams({ store: shop.id }); setShowFilters(false); }}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedShop === shop.id
                         ? 'bg-[#E8F5F1] text-[#006A52] font-medium'
                         : 'text-[#1A1A1A] hover:bg-[#F5F5F5]'
@@ -308,7 +332,7 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
                   <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#E8F5F1] text-[#006A52] text-sm rounded-full">
                     Search: "{searchQuery}"
                     <button
-                      onClick={() => setSearchQuery('')}
+                      onClick={() => updateUrlParams({ search: '' })}
                       className="hover:bg-[#006A52]/20 rounded-full p-0.5"
                     >
                       <X className="w-3 h-3" />
@@ -319,7 +343,7 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
                   <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#E8F5F1] text-[#006A52] text-sm rounded-full">
                     {categories.find((c) => c.id === selectedCategory)?.name || 'Category'}
                     <button
-                      onClick={() => setSelectedCategory('all')}
+                      onClick={() => updateUrlParams({ category: 'all' })}
                       className="hover:bg-[#006A52]/20 rounded-full p-0.5"
                     >
                       <X className="w-3 h-3" />
@@ -330,7 +354,7 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
                   <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#E8F5F1] text-[#006A52] text-sm rounded-full">
                     {shops.find((s) => s.id === selectedShop)?.name || 'Store'}
                     <button
-                      onClick={() => setSelectedShop('all')}
+                      onClick={() => updateUrlParams({ store: 'all' })}
                       className="hover:bg-[#006A52]/20 rounded-full p-0.5"
                     >
                       <X className="w-3 h-3" />
@@ -358,7 +382,7 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
                   >
                     <div
                       className="relative aspect-square bg-[#F5F5F5] overflow-hidden cursor-pointer"
-                      onClick={() => onNavigate('product-detail', { productId: product.id })}
+                      onClick={() => navigate(`/product/${product.id}`)}
                     >
                       <img
                         src={normalizeImageUrl(product.image)}
@@ -406,7 +430,7 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
 
                       <h3
                         className="font-medium text-[#1A1A1A] line-clamp-2 mb-2 cursor-pointer hover:text-[#006A52] transition-colors"
-                        onClick={() => onNavigate('product-detail', { productId: product.id })}
+                        onClick={() => navigate(`/product/${product.id}`)}
                       >
                         {product.name}
                       </h3>

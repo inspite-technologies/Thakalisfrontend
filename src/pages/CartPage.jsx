@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   ChevronLeft,
   MapPin,
@@ -14,7 +15,8 @@ import { Button } from '../components/ui/button.jsx';
 import { toast } from '../components/ui/sonner';
 import { normalizeImageUrl } from '../utils/utils.js';
 
-export default function CartPage({ onNavigate }) {
+export default function CartPage() {
+  const navigate = useNavigate();
   const {
     cart,
     cartTotal,
@@ -40,12 +42,12 @@ export default function CartPage({ onNavigate }) {
   const handlePlaceOrder = async () => {
     if (!isRegistered) {
       toast.error('Please login to place an order');
-      onNavigate('login');
+      navigate('/login');
       return;
     }
     if (!defaultAddress) {
       toast.error('Please add a delivery address');
-      onNavigate('add-address');
+      navigate('/add-address');
       return;
     }
 
@@ -61,20 +63,19 @@ export default function CartPage({ onNavigate }) {
         paymentMethod: 'Online Payment',
         deliveryAddress: defaultAddress,
       });
-      toast.success('Order placed successfully!');
-      onNavigate('payment-success', { orderId: order.id });
+      // Success toast handled in StoreContext
+      navigate('/payment-success', { state: { orderId: order.id } });
     } catch (error) {
       console.error('Order placement error:', error);
-      // Check for any payment-related keywords
+      // Error toasts handled in StoreContext
+
+      // Check for any payment-related keywords to redirect
       if (error.message && (
         error.message.toLowerCase().includes('payment') ||
         error.message.toLowerCase().includes('cancel') ||
         error.message.toLowerCase().includes('verification')
       )) {
-        toast.error(error.message.replace('Payment failed: ', '') || 'Payment Failed');
-        onNavigate('payment-failure');
-      } else {
-        toast.error('Failed to place order. Please try again.');
+        navigate('/payment-failure');
       }
     } finally {
       setIsPlacingOrder(false);
@@ -90,7 +91,7 @@ export default function CartPage({ onNavigate }) {
           </div>
           <h2 className="text-2xl font-bold text-[#1A1A1A] mb-2">Your cart is empty</h2>
           <p className="text-[#666666] mb-6">Add some products to get started</p>
-          <Button onClick={() => onNavigate('products')} className="btn-primary">
+          <Button onClick={() => navigate('/products')} className="btn-primary">
             Browse Products
           </Button>
         </div>
@@ -103,7 +104,7 @@ export default function CartPage({ onNavigate }) {
       <div className="bg-white border-b border-[#E5E5E5]">
         <div className="section-container py-4">
           <button
-            onClick={() => onNavigate('products')}
+            onClick={() => navigate('/products')}
             className="flex items-center gap-2 text-[#666666] hover:text-[#006A52] transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -126,7 +127,7 @@ export default function CartPage({ onNavigate }) {
                   Delivery Address
                 </h3>
                 <button
-                  onClick={() => onNavigate('addresses')}
+                  onClick={() => navigate('/addresses')}
                   className="text-[#006A52] text-sm font-medium hover:underline"
                 >
                   Change
@@ -151,7 +152,7 @@ export default function CartPage({ onNavigate }) {
                 </div>
               ) : (
                 <button
-                  onClick={() => onNavigate('add-address')}
+                  onClick={() => navigate('/add-address')}
                   className="w-full p-4 border-2 border-dashed border-[#E5E5E5] rounded-xl text-[#666666] hover:border-[#006A52] hover:text-[#006A52] transition-colors flex items-center justify-center gap-2"
                 >
                   <Plus className="w-5 h-5" />

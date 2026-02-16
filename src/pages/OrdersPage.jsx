@@ -1,5 +1,6 @@
 import { normalizeImageUrl } from '../utils/utils.js';
 import { Package, ChevronRight, RotateCcw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext.jsx';
 import { Button } from '../components/ui/button.jsx';
 
@@ -19,7 +20,8 @@ const statusLabels = {
   Rejected: 'Rejected',
 };
 
-export default function OrdersPage({ onNavigate }) {
+export default function OrdersPage() {
+  const navigate = useNavigate();
   const { orders } = useStore();
 
   if (orders.length === 0) {
@@ -31,7 +33,7 @@ export default function OrdersPage({ onNavigate }) {
           </div>
           <h2 className="text-2xl font-bold text-[#1A1A1A] mb-2">No orders yet</h2>
           <p className="text-[#666666] mb-6">Start shopping to see your orders here</p>
-          <Button onClick={() => onNavigate('products')} className="btn-primary">
+          <Button onClick={() => navigate('/products')} className="btn-primary">
             Browse Products
           </Button>
         </div>
@@ -132,7 +134,7 @@ export default function OrdersPage({ onNavigate }) {
                     </Button>
                   )}
                   <Button
-                    onClick={() => onNavigate('order-detail', { orderId: order.id })}
+                    onClick={() => navigate(`/order/${order.id}`)}
                     className="btn-primary"
                   >
                     View Details

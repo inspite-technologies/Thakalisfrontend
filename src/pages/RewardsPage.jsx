@@ -1,4 +1,5 @@
 import { ChevronLeft, Gift, Plus, Minus, ShoppingBag, Users, Cake, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { mockRewards, redeemOptions, waysToEarn } from '../data/mockData.js';
 import { toast } from '../components/ui/sonner';
 
@@ -9,7 +10,9 @@ const iconMap = {
   'Cake': Cake,
 };
 
-export default function RewardsPage({ onNavigate }) {
+export default function RewardsPage() {
+  const navigate = useNavigate();
+
   const handleRedeem = (points, discount) => {
     if (mockRewards.availablePoints < points) {
       toast.error(`You need ${points - mockRewards.availablePoints} more points`);
@@ -23,7 +26,7 @@ export default function RewardsPage({ onNavigate }) {
       <div className="bg-white border-b border-[#E5E5E5]">
         <div className="section-container py-4">
           <button
-            onClick={() => onNavigate('profile')}
+            onClick={() => navigate('/profile')}
             className="flex items-center gap-2 text-[#666666] hover:text-[#006A52] transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -64,8 +67,8 @@ export default function RewardsPage({ onNavigate }) {
                     <div className="flex items-center gap-3">
                       <div
                         className={`w-10 h-10 rounded-xl flex items-center justify-center ${transaction.type === 'earned'
-                            ? 'bg-[#E8F5F1]'
-                            : 'bg-[#FFF3ED]'
+                          ? 'bg-[#E8F5F1]'
+                          : 'bg-[#FFF3ED]'
                           }`}
                       >
                         {transaction.type === 'earned' ? (
@@ -83,8 +86,8 @@ export default function RewardsPage({ onNavigate }) {
                     </div>
                     <span
                       className={`font-semibold ${transaction.type === 'earned'
-                          ? 'text-[#006A52]'
-                          : 'text-[#E85A24]'
+                        ? 'text-[#006A52]'
+                        : 'text-[#E85A24]'
                         }`}
                     >
                       {transaction.type === 'earned' ? '+' : '-'}
@@ -129,8 +132,8 @@ export default function RewardsPage({ onNavigate }) {
                     onClick={() => handleRedeem(option.points, option.discount)}
                     disabled={mockRewards.availablePoints < option.points}
                     className={`w-full p-4 rounded-xl border-2 text-left transition-all ${mockRewards.availablePoints >= option.points
-                        ? 'border-[#E5E5E5] hover:border-[#006A52] hover:bg-[#E8F5F1]'
-                        : 'border-[#E5E5E5] opacity-50 cursor-not-allowed'
+                      ? 'border-[#E5E5E5] hover:border-[#006A52] hover:bg-[#E8F5F1]'
+                      : 'border-[#E5E5E5] opacity-50 cursor-not-allowed'
                       }`}
                   >
                     <div className="flex items-center justify-between">

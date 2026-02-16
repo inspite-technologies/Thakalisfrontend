@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronLeft, Users, Share2, Copy, Gift, Check, ArrowRight, UserPlus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button.jsx';
 import { toast } from '../components/ui/sonner';
 
@@ -21,7 +22,8 @@ const howItWorks = [
   },
 ];
 
-export default function ReferEarnPage({ onNavigate }) {
+export default function ReferEarnPage() {
+  const navigate = useNavigate();
   const [referralCode] = useState('THAKKAL123');
   const [copied, setCopied] = useState(false);
   const totalRewards = 250;
@@ -55,7 +57,7 @@ export default function ReferEarnPage({ onNavigate }) {
       <div className="bg-white border-b border-[#E5E5E5]">
         <div className="section-container py-4">
           <button
-            onClick={() => onNavigate('profile')}
+            onClick={() => navigate('/profile')}
             className="flex items-center gap-2 text-[#666666] hover:text-[#006A52] transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -148,7 +150,7 @@ export default function ReferEarnPage({ onNavigate }) {
             </div>
 
             <Button
-              onClick={() => onNavigate('rewards')}
+              onClick={() => navigate('/rewards')}
               className="w-full mt-6 btn-secondary"
             >
               View All Rewards
