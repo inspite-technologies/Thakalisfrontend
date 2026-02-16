@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { Search, Filter, Star, Plus, Minus, Heart, Clock, ChevronDown, X, ShoppingBag } from 'lucide-react';
+import { Search, Filter, Star, Plus, Minus, Heart, Clock, ChevronDown, X, ShoppingBag, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useStore } from '../context/StoreContext.jsx';
 import { toast } from '../components/ui/sonner';
 import { normalizeImageUrl } from '../utils/utils.js';
@@ -17,6 +17,10 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery || '');
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState('featured');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [serverTotalPages, setServerTotalPages] = useState(1);
+  const ITEMS_PER_PAGE = 12;
+
   const { addToCart, toggleWishlist, isInWishlist, cart, updateQuantity, isLoggedIn, isRegistered } = useStore();
 
   // Update selection if initial props change
@@ -25,7 +29,13 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
     setSelectedShop(initialStoreId || 'all');
     // Ensure we reset to empty string if undefined/null to clear previous search
     setSearchQuery(initialSearchQuery || '');
+    setCurrentPage(1);
   }, [initialCategoryId, initialStoreId, initialSearchQuery]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, selectedShop, searchQuery]);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -47,6 +57,15 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
           params.set('limit', '1000');
         }
       }
+
+      const isGlobalSearch = searchQuery && selectedShop === 'all';
+
+      if (!isGlobalSearch) {
+        params.append('page', currentPage);
+        params.append('limit', ITEMS_PER_PAGE);
+      }
+
+
 
       const response = await api.get(`${endpoint}?${params.toString()}`);
       const result = response.data;
@@ -84,6 +103,14 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
         if (result.filters?.categories && result.filters.categories.length > 0) {
           setCategories(result.filters.categories.map(c => ({ id: c._id, name: c.name })));
         }
+        if (result.pagination && !isGlobalSearch) {
+          setServerTotalPages(result.pagination.totalPages);
+        }
+
+        // Populate filters if they are empty (only for main products endpoint usually)
+        if (result.filters?.categories && result.filters.categories.length > 0) {
+          setCategories(result.filters.categories.map(c => ({ id: c._id, name: c.name })));
+        }
         if (result.filters?.stores && result.filters.stores.length > 0) {
           setShops(result.filters.stores.map(s => ({ id: s._id, name: s.name })));
         }
@@ -97,7 +124,7 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
     } finally {
       setLoading(false);
     }
-  }, [selectedCategory, selectedShop, searchQuery]);
+  }, [selectedCategory, selectedShop, searchQuery, currentPage]);
 
   useEffect(() => {
     fetchProducts();
@@ -321,7 +348,10 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
               </div>
             ) : filteredProducts.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                {filteredProducts.map((product) => (
+                {(searchQuery && selectedShop === 'all'
+                  ? filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+                  : filteredProducts
+                ).map((product) => (
                   <div
                     key={product.id}
                     className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group"
@@ -339,10 +369,16 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
                         }}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
-                      {product.stock <= 0 && (
+                      {product.stock <= 0 ? (
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                           <span className="bg-white/90 text-red-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
                             Out of Stock
+                          </span>
+                        </div>
+                      ) : product.stock < 10 && (
+                        <div className="absolute top-3 left-3">
+                          <span className="bg-red-100 text-red-700 px-2 py-1 rounded-md text-xs font-bold border border-red-200 shadow-sm animate-pulse">
+                            Only {product.stock} left!
                           </span>
                         </div>
                       )}
@@ -437,6 +473,67 @@ export default function ProductsPage({ onNavigate, initialCategoryId, initialSto
                 <p className="text-[#666666]">
                   Try adjusting your filters or search query
                 </p>
+              </div>
+            )}
+
+            {/* Pagination Controls */}
+            {!loading && filteredProducts.length > 0 && (
+              <div className="flex justify-center items-center mt-8 gap-2">
+                <button
+                  onClick={() => {
+                    setCurrentPage(prev => Math.max(prev - 1, 1));
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-lg border border-[#E5E5E5] bg-white text-[#666666] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#F5F5F5] transition-colors"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: (searchQuery && selectedShop === 'all') ? Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) : serverTotalPages }).map((_, i) => {
+                    const pageNum = i + 1;
+                    // Show only a window of pages logic could go here, for now simple list
+                    if (
+                      pageNum === 1 ||
+                      pageNum === ((searchQuery && selectedShop === 'all') ? Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) : serverTotalPages) ||
+                      (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                    ) {
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => {
+                            setCurrentPage(pageNum);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                          className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${currentPage === pageNum
+                            ? 'bg-[#006A52] text-white'
+                            : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F5F5F5]'
+                            }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    } else if (
+                      pageNum === currentPage - 2 ||
+                      pageNum === currentPage + 2
+                    ) {
+                      return <span key={pageNum} className="text-[#666666]">...</span>;
+                    }
+                    return null;
+                  })}
+                </div>
+
+                <button
+                  onClick={() => {
+                    setCurrentPage(prev => Math.min(prev + 1, (searchQuery && selectedShop === 'all') ? Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) : serverTotalPages));
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  disabled={currentPage === ((searchQuery && selectedShop === 'all') ? Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) : serverTotalPages)}
+                  className="p-2 rounded-lg border border-[#E5E5E5] bg-white text-[#666666] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#F5F5F5] transition-colors"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
               </div>
             )}
           </div>

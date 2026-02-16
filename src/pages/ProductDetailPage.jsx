@@ -170,6 +170,11 @@ export default function ProductDetailPage({ productId, onNavigate }) {
               <span className="text-3xl font-bold text-[#006A52]">
                 ₹{product.price}
               </span>
+              {product.stock > 0 && product.stock < 10 && (
+                <span className="text-red-600 font-semibold text-sm bg-red-50 px-3 py-1 rounded-full border border-red-100">
+                  Only {product.stock} left in stock!
+                </span>
+              )}
 
             </div>
 
