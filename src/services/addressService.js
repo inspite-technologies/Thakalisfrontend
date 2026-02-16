@@ -6,6 +6,7 @@ import api from '../api/axios';
  */
 export const addAddressApi = async (addressData) => {
     const response = await api.post('/user/address', {
+        name: addressData.name,
         addressType: addressData.type || 'home',
         fullAddress: addressData.fullAddress,
         city: addressData.city || 'Kochi',

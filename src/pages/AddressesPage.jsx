@@ -84,7 +84,12 @@ export default function AddressesPage({ onNavigate }) {
                     </div>
                   </div>
 
-                  <p className="text-[#1A1A1A] mb-2">{address.fullAddress}</p>
+                  <div className="mb-2">
+                    {address.name && (
+                      <p className="font-semibold text-[#1A1A1A]">{address.name}</p>
+                    )}
+                    <p className="text-[#1A1A1A]">{address.fullAddress}</p>
+                  </div>
                   {address.landmark && (
                     <p className="text-sm text-[#666666] mb-2">
                       Landmark: {address.landmark}

@@ -9,6 +9,7 @@ import { toast } from '../components/ui/sonner';
 export default function AddAddressPage({ onNavigate }) {
   const { addAddress } = useStore();
   const [addressType, setAddressType] = useState('home');
+  const [name, setName] = useState('');
   const [fullAddress, setFullAddress] = useState('');
   const [landmark, setLandmark] = useState('');
   const [pincode, setPincode] = useState('');
@@ -32,6 +33,7 @@ export default function AddAddressPage({ onNavigate }) {
     setIsLoading(true);
     try {
       const success = await addAddress({
+        name: name.trim(),
         type: addressType,
         fullAddress: fullAddress.trim(),
         landmark: landmark.trim() || undefined,
@@ -92,6 +94,19 @@ export default function AddAddressPage({ onNavigate }) {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#1A1A1A] mb-2">
+                Name <span className="text-[#999999]">(Optional)</span>
+              </label>
+              <Input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g., Home, Office, John Doe"
+                className="w-full px-4 py-3 h-12 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-[#006A52]/20"
+              />
             </div>
 
             <div>
