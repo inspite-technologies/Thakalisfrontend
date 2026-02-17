@@ -164,9 +164,6 @@ export default function ProductsPage() {
       case 'price-high':
         result.sort((a, b) => b.price - a.price);
         break;
-      case 'rating':
-        result.sort((a, b) => b.rating - a.rating);
-        break;
     }
 
     return result;
@@ -319,7 +316,6 @@ export default function ProductsPage() {
                     <option value="featured">Featured</option>
                     <option value="price-low">Price: Low to High</option>
                     <option value="price-high">Price: High to Low</option>
-                    <option value="rating">Highest Rated</option>
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#666666] pointer-events-none" />
                 </div>
