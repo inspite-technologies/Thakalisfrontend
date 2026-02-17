@@ -231,7 +231,7 @@ export default function ProductsPage() {
             transform transition-transform duration-300 ease-in-out lg:transform-none flex-shrink-0
             ${showFilters ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           `}>
-            <div className="h-full overflow-y-auto lg:overflow-visible bg-white rounded-r-2xl lg:rounded-2xl p-6 shadow-sm">
+            <div className="h-full overflow-y-auto lg:overflow-y-auto bg-white rounded-r-2xl lg:rounded-2xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-semibold text-[#1A1A1A]">Filters</h3>
                 <button

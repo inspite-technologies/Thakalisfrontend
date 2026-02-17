@@ -18,8 +18,41 @@ const statusLabels = {
   Pending: 'Pending',
   Accepted: 'Accepted',
   Delivered: 'Delivered',
-  Cancelled: 'Cancelled',
   Rejected: 'Rejected',
+};
+
+const getRefundStatus = (order, item) => {
+  // If order is COD, no refund
+  if (order.paymentMethod === 'COD') return null;
+
+  // If item is not cancelled, no refund tracking needed (unless whole order cancelled)
+  if (item.status !== 'Cancelled' && order.status !== 'Cancelled') return null;
+
+  // Check if specific item is refunded
+  const itemRefund = order.refunds?.find(r => r.itemId === item.productId);
+
+  // Check if full order is refunded
+  const fullRefund = order.refunds?.find(r => r.itemId === 'FULL_ORDER');
+
+  if (fullRefund || itemRefund) {
+    return {
+      step: 2,
+      label: 'Refund Completed',
+      date: fullRefund?.createdAt || itemRefund?.createdAt
+    };
+  }
+
+  // If Cancelled but not yet refunded in DB
+  if (order.paymentStatus === 'Completed' || order.paymentStatus === 'Refunded' || order.paymentStatus === 'PartialRefunded') {
+    // If payment was completed, refund should be initiated
+    return {
+      step: 1,
+      label: 'Refund Initiated',
+      date: Date.now() // Approximation or use updated at
+    };
+  }
+
+  return null;
 };
 
 export default function OrderDetailPage() {
@@ -251,6 +284,38 @@ export default function OrderDetailPage() {
                             </Button>
                           </div>
                         )}
+
+                        {/* Refund Progress Bar */}
+                        {(() => {
+                          const refundStatus = getRefundStatus(order, item);
+                          if (refundStatus) {
+                            return (
+                              <div className="mt-3 bg-[#FAFAFA] rounded-lg p-3 border border-[#E5E5E5]">
+                                <p className="text-xs font-semibold text-[#1A1A1A] mb-2">Refund Status</p>
+                                <div className="flex items-center gap-2">
+                                  {/* Step 1: Initiated */}
+                                  <div className="flex items-center gap-2 flex-1">
+                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${refundStatus.step >= 1 ? 'bg-[#006A52] text-white' : 'bg-[#E5E5E5] text-[#999999]'}`}>
+                                      <Check className="w-3 h-3" />
+                                    </div>
+                                    <div className={`h-1 flex-1 rounded-full ${refundStatus.step >= 2 ? 'bg-[#006A52]' : 'bg-[#E5E5E5]'}`} />
+                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${refundStatus.step >= 2 ? 'bg-[#006A52] text-white' : 'bg-[#E5E5E5] text-[#999999]'}`}>
+                                      <Check className="w-3 h-3" />
+                                    </div>
+                                  </div>
+                                  <span className="text-xs font-medium text-[#006A52] whitespace-nowrap">
+                                    {refundStatus.label}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between text-[10px] text-[#666666] mt-1 px-1">
+                                  <span>Initiated</span>
+                                  <span>Processed</span>
+                                </div>
+                              </div>
+                            );
+                          }
+                          return null;
+                        })()}
                       </div>
                     </div>
                   );

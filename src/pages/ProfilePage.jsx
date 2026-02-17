@@ -12,13 +12,20 @@ import {
   Mail,
   LogIn
 } from 'lucide-react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext.jsx';
 import { toast } from '../components/ui/sonner';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const { user, logout, isLoggedIn, isGuest } = useStore();
+  const { user, logout, isLoggedIn, isGuest, fetchUserDetails } = useStore();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchUserDetails();
+    }
+  }, [isLoggedIn, fetchUserDetails]);
 
   const handleLogout = () => {
     logout();

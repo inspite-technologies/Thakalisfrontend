@@ -90,7 +90,9 @@ export const normalizeOrders = (backendOrders) => {
       })),
       deliveryAddress,
       paymentStatus: order.paymentStatus || 'Pending',
-      paymentMethod: order.paymentMethod || 'Online Payment (Razorpay)'
+      paymentMethod: order.paymentMethod || 'Online Payment (Razorpay)',
+      refunds: order.refunds || [], // Pass refund data
+      razorpayPaymentId: order.razorpayPaymentId
     };
   });
 };
@@ -453,7 +455,10 @@ export function StoreProvider({ children }) {
     try {
       const result = await updateUserDetailsApi(details);
       if (result?.response?.status === 200) {
-        fetchUserDetails();
+        // Optimistic update
+        setUser(prev => ({ ...prev, ...details }));
+        // await sync
+        await fetchUserDetails();
         return true;
       }
       toast.error(result?.data?.msg || 'Failed to update profile');
@@ -788,6 +793,7 @@ export function StoreProvider({ children }) {
         placeOrder,
         deliveryLocation,
         setDeliveryLocation,
+        fetchUserDetails,
       }}
     >
       {children}
