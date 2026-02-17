@@ -33,8 +33,9 @@ export default function CartPage() {
   );
   const [paymentMethod, setPaymentMethod] = useState('online');
 
-  const deliveryFee = cartTotal >= 299 ? 0 : 40;
-  const taxes = Math.round(cartTotal * 0.05);
+  // Mock data as requested: Fees and taxes are not coming from backend yet
+  const deliveryFee = 0;
+  const taxes = 0;
   const total = cartTotal + deliveryFee + taxes;
 
   const defaultAddress = addresses.find((a) => a.id === selectedAddress);
@@ -323,19 +324,7 @@ export default function CartPage() {
               )}
             </div>
 
-            {cartTotal >= 299 && (
-              <div className="bg-[#E8F5F1] rounded-2xl p-4 flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#006A52] rounded-xl flex items-center justify-center">
-                  <Tag className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="font-medium text-[#006A52]">Yay! You saved ₹40</p>
-                  <p className="text-sm text-[#006A52]/70">
-                    Free delivery on orders above ₹299
-                  </p>
-                </div>
-              </div>
-            )}
+            {/* Removed the free delivery banner as delivery is currently mocked to 0 */}
           </div>
         </div>
       </div>

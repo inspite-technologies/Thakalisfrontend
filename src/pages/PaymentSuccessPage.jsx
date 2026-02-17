@@ -1,4 +1,4 @@
-import { CheckCircle, ShoppingBag, ArrowRight, Truck, MapPin } from 'lucide-react';
+import { CheckCircle, Truck } from 'lucide-react';
 import { Button } from '../components/ui/button.jsx';
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -41,27 +41,13 @@ export default function PaymentSuccessPage() {
                     </p>
 
                     <div className="bg-[#FAFAFA] rounded-xl p-5 mb-8 border border-[#F0F0F0] text-left">
-                        <div className="flex justify-between items-center mb-4 border-b border-[#E5E5E5] pb-3">
-                            <span className="text-sm text-[#666666]">Order ID</span>
-                            <span className="font-mono font-medium text-[#1A1A1A]">#{orderId}</span>
-                        </div>
-                        <div className="space-y-3">
-                            <div className="flex items-center gap-3 text-sm text-[#666666]">
-                                <Truck className="w-4 h-4" />
-                                <span>Status: <span className="text-[#006A52] font-medium">Preparing</span></span>
-                            </div>
+                        <div className="flex items-center gap-3 text-sm text-[#666666]">
+                            <Truck className="w-4 h-4" />
+                            <span>Status: <span className="text-[#006A52] font-medium">Preparing</span></span>
                         </div>
                     </div>
 
                     <div className="space-y-3">
-                        <Button
-                            onClick={() => navigate(`/order/${orderId}`)}
-                            className="w-full btn-primary h-12 text-base shadow-md hover:shadow-lg transition-all"
-                        >
-                            <ShoppingBag className="w-4 h-4 mr-2" />
-                            View Order Details
-                        </Button>
-
                         <Button
                             onClick={() => navigate('/')}
                             variant="outline"

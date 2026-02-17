@@ -132,47 +132,7 @@ export default function Navigation() {
             />
           </Link>
 
-          <div className="hidden lg:flex items-center gap-2 ml-8">
-            <MapPin className="w-4 h-4 text-[#006A52]" />
-            <span className="text-sm text-[#666666]">Deliver to</span>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-1 text-sm font-medium text-[#1A1A1A] hover:text-[#006A52] transition-colors">
-                  {deliveryLocation}
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
-                <DropdownMenuItem
-                  onClick={async () => {
-                    try {
-                      toast.info('Detecting location...', { duration: 1000 });
-                      const coords = await getCurrentPosition();
-                      const address = await getAddressFromCoords(coords.lat, coords.lng);
-                      // Extract just the city/area for the navbar
-                      const locationName = address.details.suburb || address.details.city || address.details.town || 'Current Location';
-                      setDeliveryLocation(locationName);
-                      toast.success('Location updated!');
-                    } catch (error) {
-                      console.error('Location error:', error);
-                      // Handle GeolocationPositionError specifically or generic errors
-                      let errorMessage = 'Could not detect location';
-                      if (error.code === 1) errorMessage = 'Location permission denied';
-                      else if (error.code === 2) errorMessage = 'Location unavailable';
-                      else if (error.code === 3) errorMessage = 'Location request timed out';
-                      else if (error.message) errorMessage = error.message;
-
-                      toast.error(errorMessage);
-                    }
-                  }}
-                  className="cursor-pointer text-[#006A52] font-medium"
-                >
-                  <MapPin className="w-3.5 h-3.5 mr-2" />
-                  Detect Location
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          {/* Location section removed as requested */}
 
           <form
             onSubmit={handleSearchSubmit}
