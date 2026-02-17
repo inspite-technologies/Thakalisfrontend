@@ -1,4 +1,4 @@
-import { CheckCircle, ShoppingBag, ArrowRight, Truck, Calendar, MapPin } from 'lucide-react';
+import { CheckCircle, ShoppingBag, ArrowRight, Truck, MapPin } from 'lucide-react';
 import { Button } from '../components/ui/button.jsx';
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -46,10 +46,6 @@ export default function PaymentSuccessPage() {
                             <span className="font-mono font-medium text-[#1A1A1A]">#{orderId}</span>
                         </div>
                         <div className="space-y-3">
-                            <div className="flex items-center gap-3 text-sm text-[#666666]">
-                                <Calendar className="w-4 h-4" />
-                                <span>Estimated Delivery: <span className="text-[#1A1A1A] font-medium">30-45 mins</span></span>
-                            </div>
                             <div className="flex items-center gap-3 text-sm text-[#666666]">
                                 <Truck className="w-4 h-4" />
                                 <span>Status: <span className="text-[#006A52] font-medium">Preparing</span></span>

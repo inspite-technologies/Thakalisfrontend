@@ -1,5 +1,5 @@
 import { MapPin, Plus, ChevronLeft, Home, Briefcase, MapPinned } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from '../context/StoreContext.jsx';
 import { Button } from '../components/ui/button.jsx';
 
@@ -11,18 +11,23 @@ const typeIcons = {
 
 export default function AddressesPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { addresses, setDefaultAddress, deleteAddress } = useStore();
+
+  const fromCart = location.state?.from === 'cart';
+  const backPath = fromCart ? '/cart' : '/profile';
+  const backLabel = fromCart ? 'Back to Cart' : 'Back to Profile';
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       <div className="bg-white border-b border-[#E5E5E5]">
         <div className="section-container py-4">
           <button
-            onClick={() => navigate('/profile')}
+            onClick={() => navigate(backPath)}
             className="flex items-center gap-2 text-[#666666] hover:text-[#006A52] transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
-            Back to Profile
+            {backLabel}
           </button>
         </div>
       </div>

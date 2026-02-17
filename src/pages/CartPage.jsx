@@ -127,7 +127,7 @@ export default function CartPage() {
                   Delivery Address
                 </h3>
                 <button
-                  onClick={() => navigate('/addresses')}
+                  onClick={() => navigate('/addresses', { state: { from: 'cart' } })}
                   className="text-[#006A52] text-sm font-medium hover:underline"
                 >
                   Change
