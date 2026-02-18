@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Phone, ArrowRight, ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button.jsx';
@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [step, setStep] = useState('phone');
   const [isLoading, setIsLoading] = useState(false);
   const { login, requestOTP } = useStore();
+  const inputRefs = useRef([]);
 
   const handleSendOTP = async (e) => {
     e.preventDefault();
@@ -128,21 +129,23 @@ export default function LoginPage() {
                       key={index}
                       type="text"
                       maxLength={1}
+                      ref={(el) => (inputRefs.current[index] = el)}
                       value={otp[index] || ''}
                       onChange={(e) => {
                         const value = e.target.value.replace(/\D/g, '');
                         const newOtp = otp.split('');
                         newOtp[index] = value;
                         setOtp(newOtp.join('').slice(0, 6));
+
+                        // Auto-focus next input
                         if (value && index < 5) {
-                          const nextInput = e.target.parentElement?.nextElementSibling?.querySelector('input');
-                          nextInput?.focus();
+                          inputRefs.current[index + 1]?.focus();
                         }
                       }}
                       onKeyDown={(e) => {
+                        // Auto-focus previous input on backspace
                         if (e.key === 'Backspace' && !otp[index] && index > 0) {
-                          const prevInput = e.currentTarget.parentElement?.previousElementSibling?.querySelector('input');
-                          prevInput?.focus();
+                          inputRefs.current[index - 1]?.focus();
                         }
                       }}
                       className="w-12 h-14 text-center text-xl font-bold bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-[#006A52]/20"

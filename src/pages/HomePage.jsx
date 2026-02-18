@@ -273,6 +273,19 @@ export default function HomePage() {
                       }}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
+                    {product.stock <= 0 ? (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <span className="bg-white/90 text-red-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                          Out of Stock
+                        </span>
+                      </div>
+                    ) : product.stock < 10 && (
+                      <div className="absolute top-3 left-3">
+                        <span className="bg-red-100 text-red-700 px-2 py-1 rounded-md text-xs font-bold border border-red-200 shadow-sm animate-pulse">
+                          Only {product.stock} left!
+                        </span>
+                      </div>
+                    )}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
