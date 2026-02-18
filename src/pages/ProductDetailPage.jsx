@@ -27,7 +27,7 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { addToCart, toggleWishlist, isInWishlist, isLoggedIn, isRegistered } = useStore();
+  const { addToCart, updateQuantity, cart, toggleWishlist, isInWishlist, isLoggedIn, isRegistered } = useStore();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -73,13 +73,14 @@ export default function ProductDetailPage() {
     }
   }, [productId]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#006A52]"></div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (product) {
+      const cartItem = cart.find(item => item.product.id === product.id);
+      if (cartItem) {
+        setQuantity(cartItem.quantity);
+      }
+    }
+  }, [cart, product]);
 
   const relatedProducts = products
     .filter((p) => p.category === product.category && p.id !== product.id)
@@ -91,7 +92,14 @@ export default function ProductDetailPage() {
       navigate('/login');
       return;
     }
-    addToCart(product, quantity);
+
+    const cartItem = cart.find(item => item.product.id === product.id);
+    if (cartItem) {
+      updateQuantity(product.id, quantity);
+      toast.success('Cart updated');
+    } else {
+      addToCart(product, quantity);
+    }
   };
 
   const handleToggleWishlist = () => {
