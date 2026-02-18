@@ -2,7 +2,7 @@
     "rewrites": [
         {
             "source": "/api/(.*)",
-            "destination": "https://thakkalies-api.onrender.com/$1"
+            "destination": "https://api.thakkalies.laavas.com/$1"
         },
         {
             "source": "/(.*)",
