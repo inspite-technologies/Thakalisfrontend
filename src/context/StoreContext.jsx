@@ -368,7 +368,7 @@ export function StoreProvider({ children }) {
       console.error('Update quantity backend error:', error);
       // Revert optimistic update
       setCart(previousCart);
-      toast.error('Failed to update quantity');
+      toast.error(error.message || 'Failed to update quantity');
     }
   }, [isLoggedIn, cart]);
 
@@ -459,6 +459,7 @@ export function StoreProvider({ children }) {
         setUser(prev => ({ ...prev, ...details }));
         // await sync
         await fetchUserDetails();
+        toast.success('User details updated successfully');
         return true;
       }
       toast.error(result?.data?.msg || 'Failed to update profile');

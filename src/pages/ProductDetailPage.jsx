@@ -82,6 +82,23 @@ export default function ProductDetailPage() {
     }
   }, [cart, product]);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#006A52]"></div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FAFAFA]">
+        <h2 className="text-2xl font-bold text-[#1A1A1A] mb-4">Product Not Found</h2>
+        <Button onClick={() => navigate('/products')}>Back to Products</Button>
+      </div>
+    );
+  }
+
   const relatedProducts = products
     .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 4);
@@ -94,6 +111,13 @@ export default function ProductDetailPage() {
     }
 
     const cartItem = cart.find(item => item.product.id === product.id);
+    const currentCartQuantity = cartItem ? cartItem.quantity : 0;
+
+    if (currentCartQuantity + quantity > product.stock) {
+      toast.error(`Cannot add more items. Only ${product.stock} left in stock.`);
+      return;
+    }
+
     if (cartItem) {
       updateQuantity(product.id, quantity);
       toast.success('Cart updated');
@@ -208,7 +232,13 @@ export default function ProductDetailPage() {
                   </button>
                   <span className="w-8 text-center font-semibold">{quantity}</span>
                   <button
-                    onClick={() => setQuantity(quantity + 1)}
+                    onClick={() => {
+                      if (quantity >= product.stock) {
+                        toast.error('Out of stock');
+                        return;
+                      }
+                      setQuantity(quantity + 1);
+                    }}
                     className="w-10 h-10 bg-white rounded-lg flex items-center justify-center hover:bg-[#E8F5F1] transition-colors"
                   >
                     <Plus className="w-4 h-4" />

@@ -16,8 +16,18 @@ export const fetchCartItems = async () => {
  */
 export const addToCartApi = async (productIdOrIds) => {
     const productIds = Array.isArray(productIdOrIds) ? productIdOrIds : [productIdOrIds];
-    const response = await api.post('/cart', { productIds });
-    return response.data;
+    try {
+        const response = await api.post('/cart', { productIds });
+        return response.data;
+    } catch (error) {
+        if (error.response && error.response.data) {
+            const errorMessage = error.response.data.msg || error.response.data.message;
+            if (errorMessage) {
+                throw new Error(errorMessage);
+            }
+        }
+        throw error;
+    }
 };
 
 /**
@@ -32,6 +42,12 @@ export const updateCartQuantityApi = async (productId, quantity) => {
         return response.data;
     } catch (error) {
         console.error('❌ Cart update failed:', error);
+        if (error.response && error.response.data) {
+            const errorMessage = error.response.data.msg || error.response.data.message;
+            if (errorMessage) {
+                throw new Error(errorMessage);
+            }
+        }
         throw error;
     }
 };

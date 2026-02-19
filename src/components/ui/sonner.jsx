@@ -81,10 +81,10 @@ function Toaster({
           description: "group-[.toast]:text-[#666666]",
           actionButton: "group-[.toast]:bg-[#006A52] group-[.toast]:text-white",
           cancelButton: "group-[.toast]:bg-[#F5F5F5] group-[.toast]:text-[#1A1A1A]",
-          success: "group-[.toaster]:border-l-[#006A52] group-[.toaster]:bg-[#E8F5F1]",
-          error: "group-[.toaster]:border-l-[#EF4444] group-[.toaster]:bg-[#FFF5F5]",
-          info: "group-[.toaster]:border-l-[#3B82F6] group-[.toaster]:bg-[#EFF6FF]",
-          warning: "group-[.toaster]:border-l-[#F59E0B] group-[.toaster]:bg-[#FFFBEB]",
+          success: "group-[.toaster]:!border-l-[#006A52] group-[.toaster]:!bg-[#E8F5F1] group-[.toaster]:!text-[#006A52]",
+          error: "group-[.toaster]:!border-l-[#EF4444] group-[.toaster]:!bg-[#FFF5F5] group-[.toaster]:!text-[#EF4444]",
+          info: "group-[.toaster]:!border-l-[#3B82F6] group-[.toaster]:!bg-[#EFF6FF] group-[.toaster]:!text-[#3B82F6]",
+          warning: "group-[.toaster]:!border-l-[#F59E0B] group-[.toaster]:!bg-[#FFFBEB] group-[.toaster]:!text-[#F59E0B]",
         },
       }}
       {...props} />
