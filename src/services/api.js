@@ -1,6 +1,7 @@
 // Base API configuration
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://thakkalies-api.onrender.com';
 export const USER_API_URL = `${API_BASE_URL}/user`;
+export const STORE_API_URL = `${API_BASE_URL}/stores`;
 
 /**
  * Get authorization headers with token

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '../context/StoreContext.jsx';
 import { toast } from '../components/ui/sonner';
+import { normalizeImageUrl } from '../utils/utils.js';
 
 export default function ProfilePage({ onNavigate }) {
   const { user, logout } = useStore();
@@ -73,8 +74,12 @@ export default function ProfilePage({ onNavigate }) {
       <div className="section-container py-8">
         <div className="bg-white rounded-2xl p-6 shadow-sm mb-6 -mt-12 relative z-10">
           <div className="flex items-center gap-4">
-            <div className="w-20 h-20 bg-[#E8F5F1] rounded-full flex items-center justify-center">
-              <User className="w-10 h-10 text-[#006A52]" />
+            <div className="w-20 h-20 bg-[#E8F5F1] rounded-full flex items-center justify-center overflow-hidden border border-[#E5E5E5]">
+              {user?.aadhaarOrLicenseImage ? (
+                <img src={normalizeImageUrl(user.aadhaarOrLicenseImage)} alt="Store" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-10 h-10 text-[#006A52]" />
+              )}
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-bold text-[#1A1A1A]">

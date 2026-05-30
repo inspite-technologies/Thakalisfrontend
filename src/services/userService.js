@@ -1,4 +1,4 @@
-import { USER_API_URL, getAuthHeaders, getAuthHeaderOnly, isAuthenticated } from './api';
+import { USER_API_URL, STORE_API_URL, getAuthHeaders, getAuthHeaderOnly, isAuthenticated } from './api';
 
 /**
  * Request OTP for phone number
@@ -45,7 +45,7 @@ export const fetchUserDetailsApi = async () => {
 };
 
 /**
- * Update user profile details
+ * Update user profile details (Generic)
  * @param {Object} details - User details to update
  */
 export const updateUserDetailsApi = async (details) => {
@@ -58,6 +58,21 @@ export const updateUserDetailsApi = async (details) => {
             fullName: details.name,
             email: details.email
         })
+    });
+    return { response, data: await response.json() };
+};
+
+/**
+ * Update store profile details (FormData)
+ * @param {FormData} formData - Store profile data with files
+ */
+export const updateStoreProfileApi = async (formData) => {
+    if (!isAuthenticated()) return null;
+
+    const response = await fetch(`${STORE_API_URL}/profile`, {
+        method: 'PUT',
+        headers: getAuthHeaderOnly(), // Let fetch set Content-Type for FormData
+        body: formData
     });
     return { response, data: await response.json() };
 };

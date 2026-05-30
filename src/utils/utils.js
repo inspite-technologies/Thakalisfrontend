@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../services/api.js';
+
 /**
  * Normalizes image URLs from the backend.
  * Fixes issues with missing hostnames, port 7071, and common malformed paths.
@@ -11,8 +13,8 @@ export const normalizeImageUrl = (url) => {
 
     if (!url) return '/product-placeholder.png';
 
-    // 1. Handle already correct full URLs
-    if (url.startsWith('http')) {
+    // 1. Handle already correct full URLs or local preview URLs
+    if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) {
         // If it points to the old port 7071, fix it to 5001
         if (url.includes(':7071')) {
             return url.replace(':7071', ':5001');

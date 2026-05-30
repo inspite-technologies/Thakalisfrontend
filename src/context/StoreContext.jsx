@@ -25,6 +25,7 @@ import {
   verifyOtpApi,
   fetchUserDetailsApi,
   updateUserDetailsApi,
+  updateStoreProfileApi,
   normalizeUserData,
   normalizeAddresses
 } from '../services/userService';
@@ -255,6 +256,18 @@ export function StoreProvider({ children }) {
     localStorage.removeItem('token');
   }, []);
 
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      console.log('auth-unauthorized event received, logging out');
+      logout();
+    };
+    window.addEventListener('auth-unauthorized', handleUnauthorized);
+    return () => {
+      window.removeEventListener('auth-unauthorized', handleUnauthorized);
+    };
+  }, [logout]);
+
+
   const addToCart = useCallback(async (product, quantity = 1) => {
     if (!isLoggedIn) {
       toast.error('Please login to add to cart');
@@ -397,6 +410,21 @@ export function StoreProvider({ children }) {
       return false;
     } catch (error) {
       console.error('Update user details error:', error);
+      return false;
+    }
+  }, [fetchUserDetails]);
+
+  const updateStoreProfile = useCallback(async (formData) => {
+    try {
+      const result = await updateStoreProfileApi(formData);
+      if (result?.response?.ok) {
+        fetchUserDetails();
+        return true;
+      }
+      toast.error(result?.data?.msg || 'Failed to update store profile');
+      return false;
+    } catch (error) {
+      console.error('Update store profile error:', error);
       return false;
     }
   }, [fetchUserDetails]);
@@ -698,6 +726,7 @@ export function StoreProvider({ children }) {
         deleteAddress,
         setDefaultAddress,
         updateUserDetails,
+        updateStoreProfile,
         orders,
         setOrders,
         placeOrder,

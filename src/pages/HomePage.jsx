@@ -63,11 +63,43 @@ export default function HomePage({ onNavigate }) {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch(`${API_BASE_URL}/stores/home`, {
+        let response = await fetch(`${API_BASE_URL}/stores/home`, {
           method: 'POST',
           headers: headers,
           body: JSON.stringify({})
         });
+
+        if (response.status === 401) {
+          console.warn('Stale/invalid token detected (401). Clearing token and requesting a fresh guest token...');
+          localStorage.removeItem('token');
+          try {
+            const guestResponse = await fetch(`${API_BASE_URL}/user/guest`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              }
+            });
+            const guestResult = await guestResponse.json();
+
+            if (guestResult.success && guestResult.token) {
+              const newToken = guestResult.token;
+              localStorage.setItem('token', newToken);
+              
+              // Retry original home data request with new guest token
+              response = await fetch(`${API_BASE_URL}/stores/home`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${newToken}`
+                },
+                body: JSON.stringify({})
+              });
+            }
+          } catch (guestError) {
+            console.error('Error fetching guest token during retry:', guestError);
+          }
+        }
+
         const result = await response.json();
         if (result.success) {
           setBanners(result.data.banners || []);

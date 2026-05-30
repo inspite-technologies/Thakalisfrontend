@@ -8,6 +8,7 @@ import { cancelProductApi } from '../services/orderService.js';
 const statusColors = {
   Pending: 'bg-[#FFF3ED] text-[#E85A24]',
   Accepted: 'bg-[#E8F5F1] text-[#006A52]',
+  'Order Confirmed': 'bg-[#E8F5F1] text-[#006A52]',
   Delivered: 'bg-[#E8F5F1] text-[#22C55E]',
   Cancelled: 'bg-[#FFF3ED] text-[#EF4444]',
   Rejected: 'bg-[#FFF3ED] text-[#EF4444]',
@@ -16,6 +17,7 @@ const statusColors = {
 const statusLabels = {
   Pending: 'Pending',
   Accepted: 'Accepted',
+  'Order Confirmed': 'Order Confirmed',
   Delivered: 'Delivered',
   Cancelled: 'Cancelled',
   Rejected: 'Rejected',
@@ -161,7 +163,7 @@ export default function OrderDetailPage({ orderId, onNavigate }) {
                 {order.items?.map((item, index) => {
                   const productId = item.productId || item.product?._id || item.product?.id;
                   const itemStatus = item.status || 'Pending';
-                  const canCancel = itemStatus === 'Pending' || itemStatus === 'Accepted';
+                  const canCancel = itemStatus === 'Pending' || itemStatus === 'Accepted' || itemStatus === 'Order Confirmed';
                   const isCancelling = cancellingProducts[productId];
 
                   return (
@@ -269,9 +271,9 @@ export default function OrderDetailPage({ orderId, onNavigate }) {
 
             <div className="space-y-3">
               {(() => {
-                // Check if any items are accepted or delivered
+                // Check if any items are confirmed, accepted or delivered
                 const hasAcceptedItems = order.items?.some(item =>
-                  item.status === 'Accepted' || item.status === 'Delivered'
+                  item.status === 'Order Confirmed' || item.status === 'Accepted' || item.status === 'Delivered'
                 );
 
                 return hasAcceptedItems ? (
@@ -288,7 +290,7 @@ export default function OrderDetailPage({ orderId, onNavigate }) {
                 ) : (
                   <div className="text-center p-4 bg-[#FFF3ED] rounded-lg border border-[#E85A24]">
                     <p className="text-sm text-[#E85A24] font-medium">
-                      📄 Invoice will be available after vendor accepts your items
+                      📄 Invoice will be available once the order is confirmed
                     </p>
                   </div>
                 );
